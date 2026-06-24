@@ -1,0 +1,290 @@
+/**
+ * ClimateGuard - Theme Styles
+ * Light/Dark Mode, Color Schemes
+ */
+
+/* ===========================
+   DARK THEME (DEFAULT)
+=========================== */
+body {
+    --current-bg: var(--color-bg-primary);
+    --current-text: var(--color-text-primary);
+    --current-text-secondary: var(--color-text-secondary);
+    --current-card-bg: var(--glass-bg);
+    --current-card-border: var(--glass-border);
+    
+    background: var(--current-bg);
+    color: var(--current-text);
+}
+
+/* ===========================
+   LIGHT THEME
+=========================== */
+body.light {
+    --color-bg-primary: #f0f5fa;
+    --color-bg-secondary: #ffffff;
+    --color-text-primary: #1a1a2e;
+    --color-text-secondary: rgba(26, 26, 46, 0.6);
+    --color-text-tertiary: rgba(26, 26, 46, 0.4);
+    
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-bg-hover: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    
+    --current-bg: var(--color-bg-primary);
+    --current-text: var(--color-text-primary);
+    --current-text-secondary: var(--color-text-secondary);
+    --current-card-bg: var(--glass-bg);
+    --current-card-border: var(--glass-border);
+}
+
+body.light .navbar {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+body.light .tab-bar {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+body.light .icon-btn {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--color-text-primary);
+}
+
+body.light .icon-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.light .card {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+body.light .card:hover {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+}
+
+body.light .card__header,
+body.light .card__desc,
+body.light .section__title {
+    color: var(--color-text-secondary);
+}
+
+body.light .settings-panel {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+body.light .list-item {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+}
+
+body.light .list-item:hover {
+    background: var(--glass-bg-hover);
+}
+
+body.light .input {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    color: var(--color-text-primary);
+}
+
+body.light .input::placeholder {
+    color: var(--color-text-secondary);
+}
+
+body.light .toggle__slider {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+body.light .progress-bar {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.light .btn--secondary {
+    background: var(--glass-bg);
+    color: var(--color-text-primary);
+    border-color: var(--glass-border);
+}
+
+body.light .btn--ghost {
+    color: var(--color-text-primary);
+}
+
+body.light .btn--ghost:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* ===========================
+   WEATHER-BASED THEMES
+=========================== */
+
+/* Clear Day */
+body[data-weather="clear_day"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #87ceeb 0%, 
+        #98d4ee 20%,
+        #b4e1f7 50%,
+        #d4edfb 80%,
+        #e8f4fc 100%
+    );
+}
+
+body.light[data-weather="clear_day"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #4da6e0 0%, 
+        #7ec8f0 30%,
+        #a8daf5 60%,
+        #d4edfb 100%
+    );
+}
+
+/* Clear Night */
+body[data-weather="clear_night"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #0a0a1a 0%, 
+        #0d1426 20%,
+        #141e33 50%,
+        #1a2640 80%,
+        #1e2a4a 100%
+    );
+}
+
+/* Cloudy */
+body[data-weather="cloudy"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #2c3e50 0%, 
+        #4a5568 30%,
+        #64748b 60%,
+        #94a3b8 100%
+    );
+}
+
+body.light[data-weather="cloudy"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #94a3b8 0%, 
+        #b8c5d1 30%,
+        #d1dae3 60%,
+        #e8eef3 100%
+    );
+}
+
+/* Rain */
+body[data-weather="rain"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #1a1a2e 0%, 
+        #2d3748 30%,
+        #4a5568 60%,
+        #718096 100%
+    );
+}
+
+body.light[data-weather="rain"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #64748b 0%, 
+        #94a3b8 30%,
+        #b8c5d1 60%,
+        #d1dae3 100%
+    );
+}
+
+/* Storm */
+body[data-weather="storm"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #0a0a12 0%, 
+        #1a1a2e 30%,
+        #2d2d44 60%,
+        #3d3d5c 100%
+    );
+}
+
+/* Snow */
+body[data-weather="snow"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #334155 0%, 
+        #64748b 30%,
+        #94a3b8 60%,
+        #cbd5e1 100%
+    );
+}
+
+body.light[data-weather="snow"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #94a3b8 0%, 
+        #cbd5e1 30%,
+        #e2e8f0 60%,
+        #f8fafc 100%
+    );
+}
+
+/* Fog */
+body[data-weather="fog"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #2d3748 0%, 
+        #4a5568 30%,
+        #718096 60%,
+        #a0aec0 100%
+    );
+}
+
+body.light[data-weather="fog"] {
+    --weather-gradient: linear-gradient(180deg, 
+        #94a3b8 0%, 
+        #b8c5d1 30%,
+        #d1dae3 60%,
+        #e8eef3 100%
+    );
+}
+
+/* ===========================
+   THEME TRANSITION
+=========================== */
+.theme-transitioning,
+.theme-transitioning * {
+    transition: background-color 0.5s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease,
+                box-shadow 0.3s ease !important;
+}
+
+/* ===========================
+   REDUCED MOTION
+=========================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ===========================
+   HIGH CONTRAST
+=========================== */
+@media (prefers-contrast: high) {
+    :root {
+        --glass-bg: rgba(0, 0, 0, 0.9);
+        --glass-border: rgba(255, 255, 255, 0.3);
+    }
+    
+    body.light {
+        --glass-bg: rgba(255, 255, 255, 0.95);
+        --glass-border: rgba(0, 0, 0, 0.3);
+    }
+    
+    .card,
+    .list-item,
+    .navbar,
+    .tab-bar {
+        border-width: 2px;
+    }
+}

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a12">
+    <meta name="description" content="ClimateGuard - Premium Weather Risk Predictor & Trip Planner">
+    <title>ClimateGuard - Weather Risk Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="stylesheet" href="../css/weather-effects.css">
+    <link rel="stylesheet" href="../css/extended.css">
+</head>
+<body data-weather="clear_day">
+    <div class="weather-background">
+        <div class="weather-background__sky"></div>
+        <div class="weather-background__clouds"></div>
+        <div class="weather-background__particles"><canvas id="particleCanvas"></canvas></div>
+        <div class="weather-background__effects"><div class="lightning"></div></div>
+        <div class="weather-background__overlay"></div>
+    </div>
+
+    <div class="app">
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
+            <div class="navbar__logo"><i class="fa-solid fa-shield-halved navbar__logo-icon"></i><span>ClimateGuard</span></div>
+            <div class="navbar__center"><span id="currentTime">12:00 PM</span></div>
+            <div class="navbar__actions">
+                <button class="icon-btn" id="settingsBtn" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Analysis Spinner + Timestamp -->
+            <div class="analysis-timestamp">
+                <span id="analysisSpinner" style="display:none"><div class="spinner-sm"></div></span>
+                <span id="analysisTimestamp" style="display:none"></span>
+            </div>
+
+            <!-- Hero -->
+            <section class="hero text-center pt-xl pb-xl">
+                <div class="location flex flex--center gap-sm mb-sm">
+                    <i class="fa-solid fa-location-dot" style="color:var(--color-accent)"></i>
+                    <span id="locationName" class="font-semibold">San Francisco</span>
+                </div>
+                <div class="temperature" id="temperature" style="font-size:8rem;font-weight:200;letter-spacing:-8px;line-height:1">28°</div>
+                <div class="condition font-medium mb-sm" id="condition" style="font-size:1.4rem">Partly Cloudy</div>
+                <div class="hi-lo mb-xs" style="color:var(--color-text-secondary)">
+                    <span id="tempHigh">H: 32°</span><span style="margin:0 8px">|</span><span id="tempLow">L: 21°</span>
+                </div>
+                <div class="date" id="currentDate" style="color:var(--color-text-secondary);font-size:0.9rem">Monday, January 15</div>
+                <div class="scroll-indicator mt-xl"><i class="fa-solid fa-chevron-down" style="color:var(--color-text-secondary)"></i></div>
+            </section>
+
+            <!-- Plan Trip CTA -->
+            <section class="section">
+                <a href="trip-planner.html" class="trip-cta-card card card--highlight reveal" style="display:flex;align-items:center;gap:16px;padding:20px;text-decoration:none;border-width:2px">
+                    <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--color-accent),#1fa37f);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <i class="fa-solid fa-route" style="font-size:1.5rem;color:#062c23"></i>
+                    </div>
+                    <div style="flex:1"><div style="font-weight:700;font-size:1.05rem;margin-bottom:4px">Plan a Trip</div><div style="font-size:0.8rem;color:var(--color-text-secondary)">Check weather risks for your travel destination</div></div>
+                    <i class="fa-solid fa-chevron-right" style="color:var(--color-text-secondary)"></i>
+                </a>
+            </section>
+
+            <!-- Hourly Forecast -->
+            <section class="section">
+                <div class="card card--no-hover" style="padding:16px 0">
+                    <div class="card__header" style="padding:0 16px"><i class="fa-solid fa-clock"></i><span data-i18n="hourlyForecast">Hourly Forecast</span></div>
+                    <div class="scroll-x" style="padding:0 16px 8px"><div class="flex gap-xs" id="hourlyContainer" style="min-width:max-content"></div></div>
+                </div>
+            </section>
+
+            <!-- Risk Summary -->
+            <section class="section">
+                <a href="risk-report.html" class="card card--no-hover reveal" id="riskSummaryCard" style="text-decoration:none;display:block;cursor:pointer">
+                    <div class="card__header"><i class="fa-solid fa-triangle-exclamation"></i><span>Weather Risk Summary</span>
+                        <span style="margin-left:auto;font-size:0.75rem;color:var(--color-accent)">View Full Report →</span>
+                    </div>
+                    <div id="riskSummaryContent" style="display:flex;gap:12px;flex-wrap:wrap"></div>
+                </a>
+            </section>
+
+            <!-- Detail Cards Grid -->
+            <section class="section">
+                <div class="grid grid--2-mobile gap-md">
+                    <div class="card uv-card reveal"><div class="card__header"><i class="fa-solid fa-sun"></i><span>UV Index</span></div><div class="card__value" id="uvIndexValue">6</div><span class="status-label status-label--poor">High</span><div class="progress-bar progress-bar--gradient mt-md"><div class="progress-bar__indicator uv-indicator" style="left:55%"></div></div><p class="card__desc">Apply sunscreen. UV is high until 4 PM.</p></div>
+                    <div class="card aqi-card reveal"><div class="card__header"><i class="fa-solid fa-wind"></i><span>Air Quality</span></div><div class="card__value" id="airQualityValue">42</div><span class="status-label status-label--good">Good</span><div class="progress-bar progress-bar--gradient mt-md"><div class="progress-bar__indicator aqi-indicator" style="left:14%"></div></div><p class="card__desc">Air quality is satisfactory.</p></div>
+                    <div class="card wind-card reveal"><div class="card__header"><i class="fa-solid fa-wind"></i><span>Wind</span></div><div style="position:relative;width:100px;height:100px;margin:10px auto"><svg class="compass" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="var(--glass-border)" stroke-width="2"/><text x="50" y="15" text-anchor="middle" fill="var(--color-text-secondary)" font-size="10">N</text><text x="90" y="53" text-anchor="middle" fill="var(--color-text-secondary)" font-size="10">E</text><text x="50" y="95" text-anchor="middle" fill="var(--color-text-secondary)" font-size="10">S</text><text x="10" y="53" text-anchor="middle" fill="var(--color-text-secondary)" font-size="10">W</text><polygon class="compass-needle" points="50,15 45,50 55,50" fill="var(--color-accent)" style="transform-origin:50px 50px;transform:rotate(225deg)"/></svg><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center"><div style="font-size:1.5rem;font-weight:700" id="windSpeedValue">18</div><div style="font-size:0.65rem;color:var(--color-text-secondary)">km/h</div></div></div><div class="flex flex--between mt-sm" style="font-size:0.8rem;color:var(--color-text-secondary)"><span>Direction: <strong id="windDirection" style="color:var(--color-text-primary)">SW</strong></span><span>Gusts: <strong style="color:var(--color-text-primary)">25</strong></span></div></div>
+                    <div class="card humidity-card reveal"><div class="card__header"><i class="fa-solid fa-droplet"></i><span>Humidity</span></div><div style="position:relative;width:100px;height:60px;margin:10px auto"><svg viewBox="0 0 100 60" style="width:100%;height:100%"><path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke="var(--glass-border)" stroke-width="8" stroke-linecap="round"/><path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke="var(--color-accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="126" stroke-dashoffset="44"/></svg><div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:1.8rem;font-weight:700" id="humidityValue">65%</div></div><p class="card__desc">The dew point is 18° right now.</p></div>
+                    <div class="card reveal"><div class="card__header"><i class="fa-solid fa-temperature-half"></i><span>Feels Like</span></div><div class="card__value" id="feelsLikeValue">30°</div><p class="card__desc">Humidity is making it feel warmer.</p></div>
+                    <div class="card reveal"><div class="card__header"><i class="fa-solid fa-gauge-high"></i><span>Pressure</span></div><div style="position:relative;width:100px;height:60px;margin:10px auto"><svg viewBox="0 0 100 60" style="width:100%;height:100%"><path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke="var(--glass-border)" stroke-width="8" stroke-linecap="round"/><path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke="var(--color-accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="126" stroke-dashoffset="63"/></svg><div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:1.6rem;font-weight:700" id="pressureValue">1013</div></div><div style="text-align:center;font-size:0.7rem;color:var(--color-text-secondary)">hPa</div></div>
+                    <div class="card reveal"><div class="card__header"><i class="fa-solid fa-eye"></i><span>Visibility</span></div><div class="card__value" id="visibilityValue">10 km</div><p class="card__desc">It's perfectly clear right now.</p></div>
+                    <div class="card reveal"><div class="card__header"><i class="fa-solid fa-cloud-rain"></i><span>Precipitation</span></div><div style="font-size:2rem;font-weight:700">0 mm</div><p style="font-size:0.85rem;color:var(--color-text-secondary)">expected in next 24h</p><div style="height:60px;margin-top:10px"><canvas id="precipChart"></canvas></div></div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section class="section reveal">
+                <div class="section__header"><span class="section__title">How It Works</span></div>
+                <div class="how-it-works">
+                    <div class="how-step"><div class="how-step__number">1</div><div class="how-step__title">Search Any City</div><div class="how-step__desc">Search any city worldwide using our global database powered by OpenWeatherMap.</div></div>
+                    <div class="how-step"><div class="how-step__number">2</div><div class="how-step__title">Analyze Risks</div><div class="how-step__desc">Our engine evaluates UV, wind, heat, storms, air quality and more in real-time.</div></div>
+                    <div class="how-step"><div class="how-step__number">3</div><div class="how-step__title">Get Verdict</div><div class="how-step__desc">Receive Go / Caution / Avoid verdicts with actionable recommendations.</div></div>
+                    <div class="how-step"><div class="how-step__number">4</div><div class="how-step__title">Travel Safe</div><div class="how-step__desc">Download PDF reports, set trip reminders, and stay informed on the go.</div></div>
+                </div>
+            </section>
+
+            <!-- Feature Highlights -->
+            <section class="section reveal">
+                <div class="section__header"><span class="section__title">Features</span></div>
+                <div class="feature-strip">
+                    <div class="feature-strip__item"><i class="fa-solid fa-clock-rotate-left"></i><span>Real-Time Updates</span></div>
+                    <div class="feature-strip__item"><i class="fa-solid fa-city"></i><span>Multi-City Compare</span></div>
+                    <div class="feature-strip__item"><i class="fa-solid fa-file-pdf"></i><span>PDF Reports</span></div>
+                    <div class="feature-strip__item"><i class="fa-solid fa-bell"></i><span>Trip Reminders</span></div>
+                    <div class="feature-strip__item"><i class="fa-solid fa-phone"></i><span>Emergency SOS</span></div>
+                    <div class="feature-strip__item"><i class="fa-solid fa-language"></i><span>5 Languages</span></div>
+                </div>
+            </section>
+
+            <!-- Popular Destinations Risk Today -->
+            <section class="section reveal">
+                <div class="section__header"><span class="section__title">Popular Destinations Risk Today</span></div>
+                <div class="popular-destinations-grid" id="popularDestinations">
+                    <div class="popular-dest-card"><div class="spinner-sm" style="margin:20px auto"></div></div>
+                </div>
+            </section>
+
+            <!-- Trip Countdowns -->
+            <section class="section reveal">
+                <div class="section__header"><span class="section__title">My Trip Countdowns</span></div>
+                <div id="tripCountdowns"><p class="empty-state">No saved trips yet</p></div>
+            </section>
+
+            <!-- Quick Links -->
+            <section class="section">
+                <div class="grid grid--2-mobile gap-md">
+                    <a href="compare.html" class="card card--highlight reveal" style="text-decoration:none;text-align:center;padding:20px">
+                        <i class="fa-solid fa-chart-column" style="font-size:1.5rem;color:var(--color-accent);margin-bottom:8px;display:block"></i>
+                        <div style="font-weight:700;font-size:0.9rem">Multi-City Compare</div>
+                        <div style="font-size:0.75rem;color:var(--color-text-secondary)">Compare up to 5 cities</div>
+                    </a>
+                    <a href="emergency.html" class="card card--highlight reveal" style="text-decoration:none;text-align:center;padding:20px">
+                        <i class="fa-solid fa-phone-volume" style="font-size:1.5rem;color:#ef4444;margin-bottom:8px;display:block"></i>
+                        <div style="font-weight:700;font-size:0.9rem">Emergency Contacts</div>
+                        <div style="font-size:0.75rem;color:var(--color-text-secondary)">SOS & global numbers</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Wind Map -->
+            <section class="section">
+                <div class="card card--highlight reveal" style="border-width:2px;overflow:hidden">
+                    <div class="card__header"><i class="fa-solid fa-map-location-dot"></i><span>Wind Map</span></div>
+                    <div style="height:150px;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(43,212,167,0.1),rgba(30,42,74,0.3));border-radius:12px;overflow:hidden">
+                        <div class="wind-particles"><div class="wind-particle"></div><div class="wind-particle"></div><div class="wind-particle"></div><div class="wind-particle"></div></div>
+                        <a href="map.html" class="btn btn--primary" style="z-index:1"><i class="fa-solid fa-location-crosshairs"></i><span>Explore Map</span></a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="footer-grid">
+                <div class="footer-col"><div class="footer-col__title">Navigate</div><a href="index.html">Home</a><a href="risk-report.html">Risk Report</a><a href="trip-planner.html">Trip Planner</a><a href="map.html">Weather Map</a></div>
+                <div class="footer-col"><div class="footer-col__title">Tools</div><a href="compare.html">City Compare</a><a href="emergency.html">Emergency SOS</a><a href="search.html">Search</a></div>
+                <div class="footer-col"><div class="footer-col__title">Settings</div><a href="#" onclick="UI.openSettings();return false">Preferences</a><a href="#" onclick="UI.openSettings();return false">Theme</a><a href="#" onclick="UI.openSettings();return false">Language</a></div>
+            </div>
+            <div class="footer-bottom">ClimateGuard v6 — Weather Risk Predictor<br>Data powered by OpenWeatherMap</div>
+        </footer>
+
+        <!-- Settings Panel (Full) -->
+        <div class="settings-overlay" id="settingsOverlay"></div>
+        <aside class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings">
+            <div class="settings-panel__header">
+                <span class="settings-panel__title" data-i18n="settings">Settings</span>
+                <button class="icon-btn" id="closeSettings" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Profile -->
+            <div class="settings-section">
+                <div class="settings-section__title"><i class="fa-solid fa-user"></i> Profile</div>
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar" id="profileAvatar" title="Click to upload avatar"><i class="fa-solid fa-user"></i></div>
+                    <input type="file" id="avatarUpload" accept="image/*" style="display:none">
+                    <div><input class="settings-input" id="profileName" placeholder="Display Name"><input class="settings-input" id="profileCity" placeholder="Home City"></div>
+                </div>
+            </div>
+
+            <!-- Theme -->
+            <div class="settings-section">
+                <div class="settings-section__title"><i class="fa-solid fa-palette"></i> Theme</div>
+                <div class="settings-item"><div><div class="settings-item__label">Dark Mode</div><div class="settings-item__desc">Use dark theme</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="themeToggle" checked><span class="toggle__slider"></span></label></div>
+                <div class="settings-item"><div><div class="settings-item__label">Auto Weather Theme</div><div class="settings-item__desc">Theme follows weather</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="autoThemeToggle" checked><span class="toggle__slider"></span></label></div>
+                <div class="settings-item"><div><div class="settings-item__label">Animations</div><div class="settings-item__desc">Enable weather effects</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="animationsToggle" checked><span class="toggle__slider"></span></label></div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="settings-section">
+                <div class="settings-section__title"><i class="fa-solid fa-bell"></i> Notifications</div>
+                <div class="settings-item"><div><div class="settings-item__label">Enable Notifications</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="notifMaster"><span class="toggle__slider"></span></label></div>
+                <div id="notifGranular" style="display:none">
+                    <div class="settings-item"><div><div class="settings-item__label">Weather Alerts</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="notifWeather" checked><span class="toggle__slider"></span></label></div>
+                    <div class="settings-item"><div><div class="settings-item__label">Trip Reminders</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="notifTrips" checked><span class="toggle__slider"></span></label></div>
+                    <div class="settings-item"><div><div class="settings-item__label">Daily Forecast</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="notifDaily"><span class="toggle__slider"></span></label></div>
+                    <div class="settings-item"><div><div class="settings-item__label">Emergency Alerts</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="notifEmergency" checked><span class="toggle__slider"></span></label></div>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="settings-section">
+                <div class="settings-section__title"><i class="fa-solid fa-location-dot"></i> Location</div>
+                <div class="settings-item"><div><div class="settings-item__label">Enable GPS</div><div class="settings-item__desc">Auto-detect city on load</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="gpsToggle"><span class="toggle__slider"></span></label></div>
+                <div style="margin-top:8px">Permission: <span class="permission-badge permission-badge--default" id="gpsStatus">Not Asked</span></div>
+            </div>
+
+            <!-- Network -->
+            <div class="settings-section">
+                <div class="settings-section__title"><i class="fa-solid fa-wifi"></i> Network Status</div>
+                <div class="network-indicator"><div class="network-dot network-dot--online" id="networkDot"></div><span id="networkLabel">Online</span></div>
+            </div>
+
+            <!-- Language -->
+            <div class="settings-section">
+                <div class="settings-section__title"><i class="fa-solid fa-language"></i> Language</div>
+                <select class="settings-select" id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="es">Español (Spanish)</option>
+                    <option value="fr">Français (French)</option>
+                    <option value="ar">العربية (Arabic)</option>
+                </select>
+            </div>
+
+            <!-- Demo Weather -->
+            <div class="mt-xl" id="demoWeatherSection">
+                <p style="font-size:0.75rem;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px">Preview Weather Themes</p>
+                <div class="grid grid--2 gap-sm">
+                    <button class="btn btn--secondary btn--sm" onclick="App.setDemoWeather('clear_day')"><i class="fa-solid fa-sun"></i> Clear Day</button>
+                    <button class="btn btn--secondary btn--sm" onclick="App.setDemoWeather('clear_night')"><i class="fa-solid fa-moon"></i> Night</button>
+                    <button class="btn btn--secondary btn--sm" onclick="App.setDemoWeather('cloudy')"><i class="fa-solid fa-cloud"></i> Cloudy</button>
+                    <button class="btn btn--secondary btn--sm" onclick="App.setDemoWeather('rain')"><i class="fa-solid fa-cloud-rain"></i> Rain</button>
+                    <button class="btn btn--secondary btn--sm" onclick="App.setDemoWeather('storm')"><i class="fa-solid fa-cloud-bolt"></i> Storm</button>
+                    <button class="btn btn--secondary btn--sm" onclick="App.setDemoWeather('snow')"><i class="fa-solid fa-snowflake"></i> Snow</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Tab Bar -->
+        <nav class="tab-bar" role="navigation" aria-label="Page navigation">
+            <a href="index.html" class="tab-item active" aria-label="Home"><i class="fa-solid fa-house"></i><span>Home</span></a>
+            <a href="map.html" class="tab-item" aria-label="Map"><i class="fa-solid fa-map-location-dot"></i><span>Map</span></a>
+            <a href="risk-report.html" class="tab-item" aria-label="Risk"><i class="fa-solid fa-triangle-exclamation"></i><span>Risk</span></a>
+            <a href="trip-planner.html" class="tab-item" aria-label="Trip"><i class="fa-solid fa-route"></i><span>Trip</span></a>
+            <a href="search.html" class="tab-item" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a>
+        </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/particles.js"></script>
+    <script src="../js/weather-engine.js"></script>
+    <script src="../js/animation-engine.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/risk-engine.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/settings-handler.js"></script>
+</body>
+</html>

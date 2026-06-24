@@ -1,0 +1,284 @@
+/**
+ * ClimateGuard - Risk Report Styles
+ */
+
+/* Overall Risk Gauge */
+.risk-gauge {
+    position: relative;
+    width: 200px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.risk-gauge__svg {
+    width: 100%;
+    height: 100%;
+}
+
+.risk-gauge__bg {
+    fill: none;
+    stroke: var(--glass-border);
+    stroke-width: 12;
+    stroke-linecap: round;
+}
+
+.risk-gauge__fill {
+    fill: none;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease, stroke 0.5s ease;
+}
+
+.risk-gauge__value {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.risk-gauge__number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.risk-gauge__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+}
+
+/* Risk Category Cards */
+.risk-category {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.risk-category:hover {
+    transform: translateY(-2px);
+    background: var(--glass-bg-hover);
+    box-shadow: var(--glass-shadow);
+}
+
+.risk-category__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.risk-category__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.risk-category__title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    flex: 1;
+}
+
+.risk-category__level {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+}
+
+.risk-category__bar {
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.08);
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.risk-category__bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.8s ease;
+}
+
+.risk-category__value {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.risk-category__desc {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+.risk-category__advice {
+    font-size: 0.78rem;
+    color: var(--color-text-primary);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    margin-top: 10px;
+    border-left: 3px solid var(--color-accent);
+}
+
+/* Recommendations */
+.recommendation-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 8px;
+}
+
+.recommendation-item__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.recommendation-item__content {
+    flex: 1;
+}
+
+.recommendation-item__title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+}
+
+.recommendation-item__text {
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+/* Travel Advisory Box */
+.travel-advisory {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+    margin-top: 16px;
+}
+
+.travel-advisory__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.travel-advisory__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.travel-advisory__summary {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.packing-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.packing-list__item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.packing-list__item i {
+    color: var(--color-accent);
+    font-size: 0.65rem;
+}
+
+/* Download Button */
+.download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--color-accent), #1fa37f);
+    color: #062c23;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.download-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--color-accent-glow);
+}
+
+.download-btn:active {
+    transform: scale(0.98);
+}
+
+.download-btn i {
+    position: relative;
+    z-index: 1;
+}
+
+.download-btn span {
+    position: relative;
+    z-index: 1;
+}

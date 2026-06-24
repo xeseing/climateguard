@@ -1,0 +1,264 @@
+/**
+ * ClimateGuard - Base Styles
+ * Reset, Typography, Variables
+ */
+
+/* CSS Reset */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    transition: background 0.5s ease, color 0.3s ease;
+}
+
+/* CSS Variables */
+:root {
+    /* Colors - Dark Theme */
+    --color-bg-primary: #0a0a12;
+    --color-bg-secondary: #12121a;
+    --color-text-primary: #ffffff;
+    --color-text-secondary: rgba(255, 255, 255, 0.6);
+    --color-text-tertiary: rgba(255, 255, 255, 0.4);
+    --color-accent: #2bd4a7;
+    --color-accent-secondary: #1fa37f;
+    --color-accent-glow: rgba(43, 212, 167, 0.3);
+
+    /* Glass Effect */
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-bg-hover: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --glass-blur: 20px;
+
+    /* Weather Colors */
+    --color-sunny: #fbbf24;
+    --color-cloudy: #94a3b8;
+    --color-rain: #3b82f6;
+    --color-storm: #7c3aed;
+    --color-snow: #e2e8f0;
+    --color-fog: #cbd5e1;
+
+    /* Status Colors */
+    --color-good: #22c55e;
+    --color-moderate: #eab308;
+    --color-poor: #f97316;
+    --color-danger: #ef4444;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+
+    /* Typography */
+    --font-size-xs: 0.65rem;
+    --font-size-sm: 0.75rem;
+    --font-size-base: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    --font-size-4xl: 3rem;
+    --font-size-5xl: 4rem;
+    --font-size-hero: 7rem;
+
+    /* Font Weights */
+    --font-light: 300;
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    --transition-bounce: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Z-Index Scale */
+    --z-background: -1;
+    --z-base: 1;
+    --z-dropdown: 10;
+    --z-sticky: 50;
+    --z-fixed: 100;
+    --z-modal-backdrop: 150;
+    --z-modal: 200;
+    --z-tooltip: 300;
+    --z-notification: 400;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: var(--font-bold);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    font-size: var(--font-size-4xl);
+}
+
+h2 {
+    font-size: var(--font-size-3xl);
+}
+
+h3 {
+    font-size: var(--font-size-2xl);
+}
+
+h4 {
+    font-size: var(--font-size-xl);
+}
+
+h5 {
+    font-size: var(--font-size-lg);
+}
+
+h6 {
+    font-size: var(--font-size-md);
+}
+
+p {
+    color: var(--color-text-secondary);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+input,
+textarea,
+select {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* Utility Classes */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.font-light {
+    font-weight: var(--font-light);
+}
+
+.font-regular {
+    font-weight: var(--font-regular);
+}
+
+.font-medium {
+    font-weight: var(--font-medium);
+}
+
+.font-semibold {
+    font-weight: var(--font-semibold);
+}
+
+.font-bold {
+    font-weight: var(--font-bold);
+}
+
+/* Selection */
+::selection {
+    background: var(--color-accent);
+    color: var(--color-bg-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary);
+}
+
+/* Focus Styles */
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}

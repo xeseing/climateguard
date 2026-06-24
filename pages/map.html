@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a12">
+    <title>ClimateGuard - Weather Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <style>
+        body { background: #0a0a12; color: #fff; }
+        .map-wrap { position: fixed; top: 60px; left: 0; right: 0; bottom: 64px; z-index: 1; }
+        #map { width: 100%; height: 100%; background: #0a0a12; }
+        .leaflet-container { background: #0a0a12; }
+        .weather-marker { background: none !important; border: none !important; }
+
+        .map-controls {
+            position: fixed; top: 76px; right: 14px; z-index: 1000;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .map-btn {
+            width: 42px; height: 42px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(10,10,18,0.85); backdrop-filter: blur(16px);
+            color: #fff; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 1rem; transition: all 0.2s;
+        }
+        .map-btn:hover { background: rgba(255,255,255,0.12); transform: scale(1.05); }
+        .map-btn.active { background: #2bd4a7; color: #062c23; border-color: #2bd4a7; box-shadow: 0 4px 16px rgba(43,212,167,0.3); }
+
+        .map-info {
+            position: fixed; bottom: 80px; left: 14px; right: 14px; max-width: 400px;
+            background: rgba(10,10,18,0.95); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            padding: 16px; z-index: 1000;
+            transform: translateY(140%); transition: transform 0.3s ease;
+        }
+        .map-info.show { transform: translateY(0); }
+        .map-info-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.08); }
+        .map-info-stats { display:flex; gap:12px; flex-wrap:wrap; }
+        .map-info-stat { flex:1; min-width:60px; text-align:center; }
+        .map-info-stat .label { font-size:0.6rem; text-transform:uppercase; letter-spacing:0.06em; color:rgba(255,255,255,0.5); }
+        .map-info-stat .val { font-size:1.2rem; font-weight:700; margin-top:2px; }
+        .close-info { background:rgba(255,255,255,0.08); border:none; color:#fff; width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:0.8rem; }
+
+        .map-legend {
+            position: fixed; bottom: 80px; left: 14px; max-width: 260px;
+            background: rgba(10,10,18,0.92); backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+            padding: 12px 14px; z-index: 999;
+        }
+        .legend-title { font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.5); margin-bottom:8px; }
+        .legend-bar { height:6px; border-radius:3px; margin-bottom:4px; }
+        .legend-labels { display:flex; justify-content:space-between; font-size:0.6rem; color:rgba(255,255,255,0.4); }
+
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(10,10,18,0.85); backdrop-filter:blur(20px); border-bottom:1px solid rgba(255,255,255,0.08); }
+        .navbar__logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:1.05rem; }
+        .navbar__logo i { color:#2bd4a7; }
+
+        .tab-bar { position:fixed; bottom:0; left:0; right:0; display:flex; justify-content:space-around; padding:12px 0 calc(16px + env(safe-area-inset-bottom)); background:rgba(10,10,18,0.95); backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,0.08); z-index:100; }
+        .tab-item { display:flex; flex-direction:column; align-items:center; gap:3px; color:rgba(255,255,255,0.5); font-size:0.6rem; font-weight:600; text-decoration:none; padding:4px 12px; }
+        .tab-item i { font-size:1.15rem; }
+        .tab-item.active { color:#2bd4a7; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar__logo"><i class="fa-solid fa-shield-halved"></i><span>ClimateGuard</span></div>
+        <span style="font-weight:600; font-size:0.85rem; opacity:0.8;">Weather Map</span>
+        <button class="map-btn" style="width:36px;height:36px;font-size:0.85rem;" onclick="location.href='search.html'"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </nav>
+
+    <div class="map-wrap"><div id="map"></div></div>
+
+    <div class="map-controls">
+        <button class="map-btn" id="locateBtn" title="My Location"><i class="fa-solid fa-location-crosshairs"></i></button>
+        <div style="height:4px;"></div>
+        <button class="map-btn active" data-layer="temp" title="Temperature"><i class="fa-solid fa-temperature-half"></i></button>
+        <button class="map-btn" data-layer="wind" title="Wind"><i class="fa-solid fa-wind"></i></button>
+        <button class="map-btn" data-layer="precip" title="Precipitation"><i class="fa-solid fa-cloud-rain"></i></button>
+        <button class="map-btn" data-layer="clouds" title="Clouds"><i class="fa-solid fa-cloud"></i></button>
+        <div style="height:4px;"></div>
+        <button class="map-btn" id="riskBtn" title="Risk Zones"><i class="fa-solid fa-triangle-exclamation"></i></button>
+    </div>
+
+    <div class="map-info" id="mapInfo">
+        <div class="map-info-head">
+            <div style="display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-circle-info" style="color:#2bd4a7;"></i><strong id="infoName">City</strong></div>
+            <button class="close-info" id="closeInfo"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="map-info-stats">
+            <div class="map-info-stat"><div class="label">Temp</div><div class="val" id="infoTemp">--</div></div>
+            <div class="map-info-stat"><div class="label">Wind</div><div class="val" id="infoWind">--</div></div>
+            <div class="map-info-stat"><div class="label">Humidity</div><div class="val" id="infoHum">--</div></div>
+            <div class="map-info-stat"><div class="label">Risk</div><div class="val" id="infoRisk">--</div></div>
+        </div>
+    </div>
+
+    <div class="map-legend" id="legend">
+        <div class="legend-title" id="legendTitle">Temperature (°C)</div>
+        <div class="legend-bar" id="legendBar" style="background:linear-gradient(to right,#3b82f6,#06b6d4,#22c55e,#eab308,#f97316,#ef4444);"></div>
+        <div class="legend-labels" id="legendLabels"><span>-20</span><span>0</span><span>15</span><span>25</span><span>35</span><span>45+</span></div>
+    </div>
+
+    <nav class="tab-bar">
+        <a href="index.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="map.html" class="tab-item active"><i class="fa-solid fa-map-location-dot"></i><span>Map</span></a>
+        <a href="risk-report.html" class="tab-item"><i class="fa-solid fa-triangle-exclamation"></i><span>Risk</span></a>
+        <a href="trip-planner.html" class="tab-item"><i class="fa-solid fa-route"></i><span>Trip</span></a>
+        <a href="search.html" class="tab-item"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a>
+    </nav>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../js/config.js"></script>
+    <script>
+    (function(){
+        const CITIES = [
+            {name:'Mumbai',lat:19.076,lon:72.877,temp:33,wind:14,hum:75,cond:'Humid',risk:'Moderate'},
+            {name:'New Delhi',lat:28.613,lon:77.209,temp:38,wind:12,hum:40,cond:'Sunny',risk:'High'},
+            {name:'Bengaluru',lat:12.971,lon:77.594,temp:28,wind:10,hum:60,cond:'Partly Cloudy',risk:'Low'},
+            {name:'Chennai',lat:13.082,lon:80.270,temp:35,wind:16,hum:72,cond:'Humid',risk:'Moderate'},
+            {name:'Kolkata',lat:22.572,lon:88.363,temp:34,wind:18,hum:78,cond:'Humid',risk:'Moderate'},
+            {name:'Hyderabad',lat:17.385,lon:78.486,temp:36,wind:11,hum:45,cond:'Sunny',risk:'Moderate'},
+            {name:'Pune',lat:18.520,lon:73.856,temp:32,wind:10,hum:55,cond:'Partly Cloudy',risk:'Low'},
+            {name:'Ahmedabad',lat:23.022,lon:72.571,temp:37,wind:14,hum:35,cond:'Sunny',risk:'High'},
+            {name:'Jaipur',lat:26.912,lon:75.787,temp:39,wind:15,hum:28,cond:'Sunny',risk:'High'},
+            {name:'Lucknow',lat:26.846,lon:80.946,temp:36,wind:10,hum:50,cond:'Partly Cloudy',risk:'Moderate'},
+            {name:'Kochi',lat:9.931,lon:76.267,temp:30,wind:12,hum:80,cond:'Humid',risk:'Moderate'},
+            {name:'Goa',lat:15.490,lon:73.827,temp:32,wind:18,hum:70,cond:'Partly Cloudy',risk:'Low'},
+            {name:'Shimla',lat:31.104,lon:77.173,temp:18,wind:20,hum:55,cond:'Cloudy',risk:'Low'},
+            {name:'Varanasi',lat:25.317,lon:83.006,temp:37,wind:8,hum:52,cond:'Sunny',risk:'High'},
+            {name:'Srinagar',lat:34.083,lon:74.797,temp:20,wind:12,hum:60,cond:'Cloudy',risk:'Low'},
+            {name:'San Francisco',lat:37.774,lon:-122.419,temp:28,wind:18,hum:65,cond:'Partly Cloudy',risk:'Low'},
+            {name:'New York',lat:40.712,lon:-74.006,temp:25,wind:28,hum:70,cond:'Partly Cloudy',risk:'Moderate'},
+            {name:'Los Angeles',lat:34.052,lon:-118.243,temp:33,wind:12,hum:45,cond:'Sunny',risk:'Moderate'},
+            {name:'London',lat:51.507,lon:-0.127,temp:15,wind:22,hum:78,cond:'Rainy',risk:'Moderate'},
+            {name:'Tokyo',lat:35.676,lon:139.650,temp:22,wind:15,hum:62,cond:'Partly Cloudy',risk:'Low'},
+            {name:'Dubai',lat:25.204,lon:55.270,temp:38,wind:15,hum:20,cond:'Clear',risk:'High'},
+            {name:'Singapore',lat:1.352,lon:103.819,temp:31,wind:10,hum:82,cond:'Humid',risk:'Moderate'},
+            {name:'Sydney',lat:-33.868,lon:151.209,temp:19,wind:20,hum:65,cond:'Partly Cloudy',risk:'Low'},
+            {name:'Paris',lat:48.856,lon:2.352,temp:18,wind:14,hum:68,cond:'Cloudy',risk:'Low'},
+            {name:'Bangkok',lat:13.756,lon:100.501,temp:34,wind:8,hum:80,cond:'Humid',risk:'Moderate'},
+            {name:'Cairo',lat:30.044,lon:31.235,temp:35,wind:18,hum:25,cond:'Sunny',risk:'High'},
+            {name:'Seoul',lat:37.566,lon:126.978,temp:16,wind:20,hum:55,cond:'Cloudy',risk:'Low'},
+            {name:'Istanbul',lat:41.008,lon:28.978,temp:20,wind:22,hum:60,cond:'Partly Cloudy',risk:'Moderate'},
+            {name:'São Paulo',lat:-23.550,lon:-46.633,temp:24,wind:12,hum:70,cond:'Cloudy',risk:'Low'},
+            {name:'Cape Town',lat:-33.924,lon:18.424,temp:18,wind:25,hum:68,cond:'Windy',risk:'Moderate'},
+        ];
+
+        function riskColor(r){return{Low:'#22c55e',Moderate:'#eab308',High:'#f97316',Extreme:'#ef4444'}[r]||'#22c55e';}
+
+        function makeIcon(c){
+            var col=riskColor(c.risk);
+            return L.divIcon({className:'weather-marker',
+                html:'<div style="background:rgba(10,10,18,0.92);border:2px solid '+col+';border-radius:12px;padding:5px 9px;color:#fff;font-family:Plus Jakarta Sans,sans-serif;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,0.5);text-align:center;line-height:1.2;">'+c.temp+'°<div style="font-size:8px;font-weight:500;opacity:0.65;">'+c.name+'</div></div>',
+                iconSize:[85,42],iconAnchor:[42,21]});
+        }
+
+        // Center on India by default
+        var map=L.map('map',{zoomControl:false}).setView([22,78],4);
+
+        // Use a reliable dark tile provider
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+            attribution:'&copy; OpenStreetMap',subdomains:'abcd',maxZoom:18
+        }).addTo(map);
+
+        // Force map to resize properly
+        setTimeout(function(){map.invalidateSize();},300);
+        setTimeout(function(){map.invalidateSize();},1000);
+
+        // Add markers
+        CITIES.forEach(function(c){
+            var m=L.marker([c.lat,c.lon],{icon:makeIcon(c)}).addTo(map);
+            m.on('click',function(){showInfo(c);});
+        });
+
+        // Info panel
+        function showInfo(c){
+            document.getElementById('infoName').textContent=c.name;
+            document.getElementById('infoTemp').textContent=c.temp+'°';
+            document.getElementById('infoWind').textContent=c.wind+' km/h';
+            document.getElementById('infoHum').textContent=c.hum+'%';
+            var re=document.getElementById('infoRisk');
+            re.textContent=c.risk; re.style.color=riskColor(c.risk);
+            document.getElementById('mapInfo').classList.add('show');
+            document.getElementById('legend').style.display='none';
+        }
+        document.getElementById('closeInfo').onclick=function(){
+            document.getElementById('mapInfo').classList.remove('show');
+            document.getElementById('legend').style.display='';
+        };
+
+        // Locate button
+        document.getElementById('locateBtn').onclick=function(){
+            map.locate({setView:true,maxZoom:10});
+        };
+        map.on('locationfound',function(e){
+            L.marker(e.latlng).addTo(map).bindPopup('You are here').openPopup();
+        });
+
+        // Layer buttons
+        var legends={
+            temp:{title:'Temperature (°C)',bg:'linear-gradient(to right,#3b82f6,#06b6d4,#22c55e,#eab308,#f97316,#ef4444)',labels:'-20|0|15|25|35|45+'},
+            wind:{title:'Wind Speed (km/h)',bg:'linear-gradient(to right,#3b82f6,#22c55e,#eab308,#f97316,#ef4444)',labels:'0|20|40|60|80+'},
+            precip:{title:'Precipitation (mm/h)',bg:'linear-gradient(to right,rgba(59,130,246,0.2),#60a5fa,#3b82f6,#7c3aed,#ef4444)',labels:'0|1|5|15|50+'},
+            clouds:{title:'Cloud Cover (%)',bg:'linear-gradient(to right,rgba(255,255,255,0.1),rgba(255,255,255,0.4),rgba(255,255,255,0.7),#fff)',labels:'0|25|50|75|100'},
+            risk:{title:'Risk Level',bg:'linear-gradient(to right,#22c55e,#eab308,#f97316,#ef4444)',labels:'Low|Moderate|High|Extreme'}
+        };
+
+        document.querySelectorAll('.map-btn[data-layer]').forEach(function(btn){
+            btn.addEventListener('click',function(){
+                // Toggle active
+                document.querySelectorAll('.map-btn[data-layer]').forEach(function(b){b.classList.remove('active');});
+                btn.classList.add('active');
+                var key=btn.dataset.layer;
+                // Update legend
+                var cfg=legends[key];
+                if(cfg){
+                    document.getElementById('legendTitle').textContent=cfg.title;
+                    document.getElementById('legendBar').style.background=cfg.bg;
+                    document.getElementById('legendLabels').innerHTML=cfg.labels.split('|').map(function(l){return '<span>'+l+'</span>';}).join('');
+                }
+            });
+        });
+
+        // Risk zones
+        var riskCircles=[];
+        var riskOn=false;
+        document.getElementById('riskBtn').onclick=function(){
+            if(riskOn){
+                riskCircles.forEach(function(c){map.removeLayer(c);});
+                riskCircles=[];
+                riskOn=false;
+                this.classList.remove('active');
+            }else{
+                CITIES.forEach(function(c){
+                    if(c.risk!=='Low'){
+                        var circle=L.circle([c.lat,c.lon],{
+                            radius:c.risk==='High'?120000:80000,
+                            color:riskColor(c.risk),fillColor:riskColor(c.risk),
+                            fillOpacity:0.12,weight:2,dashArray:'8,4'
+                        }).addTo(map);
+                        circle.bindPopup('<b>'+c.name+'</b><br>Risk: '+c.risk+'<br>Temp: '+c.temp+'°');
+                        riskCircles.push(circle);
+                    }
+                });
+                riskOn=true;
+                this.classList.add('active');
+                var cfg=legends.risk;
+                document.getElementById('legendTitle').textContent=cfg.title;
+                document.getElementById('legendBar').style.background=cfg.bg;
+                document.getElementById('legendLabels').innerHTML=cfg.labels.split('|').map(function(l){return '<span>'+l+'</span>';}).join('');
+            }
+        };
+    })();
+    </script>
+</body>
+</html>

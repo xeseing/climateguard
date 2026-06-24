@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a12">
+    <meta name="description" content="ClimateGuard - Weather Risk Report & Analysis">
+    <title>ClimateGuard - Risk Report</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="stylesheet" href="../css/weather-effects.css">
+    <link rel="stylesheet" href="../css/risk-report.css">
+    <link rel="stylesheet" href="../css/extended.css">
+</head>
+<body data-weather="clear_day">
+    <div class="weather-background">
+        <div class="weather-background__sky"></div>
+        <div class="weather-background__clouds"></div>
+        <div class="weather-background__particles">
+            <canvas id="particleCanvas"></canvas>
+        </div>
+        <div class="weather-background__effects">
+            <div class="lightning"></div>
+        </div>
+        <div class="weather-background__overlay"></div>
+    </div>
+
+    <div class="app">
+        <nav class="navbar">
+            <div class="navbar__logo">
+                <i class="fa-solid fa-shield-halved navbar__logo-icon"></i>
+                <span>ClimateGuard</span>
+            </div>
+            <div class="navbar__center">
+                <span id="currentTime">12:00 PM</span>
+            </div>
+            <div class="navbar__actions">
+                <button class="icon-btn" id="settingsBtn" aria-label="Settings">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-header__title">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-accent); margin-right: 8px;"></i>
+                    Weather Risk Report
+                </h1>
+                <p class="page-header__subtitle" id="reportLocation">San Francisco • Generated now</p>
+            </div>
+
+            <!-- Overall Risk Gauge -->
+            <section class="section">
+                <div class="card card--no-hover" style="padding: 24px; text-align: center;">
+                    <div class="card__header" style="justify-content: center;">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Overall Risk Level</span>
+                    </div>
+                    <div class="risk-gauge">
+                        <svg class="risk-gauge__svg" viewBox="0 0 200 120">
+                            <path class="risk-gauge__bg" d="M 20 110 A 80 80 0 0 1 180 110"/>
+                            <path class="risk-gauge__fill" id="riskGaugeFill" d="M 20 110 A 80 80 0 0 1 180 110" 
+                                  stroke="#22c55e" 
+                                  stroke-dasharray="251" 
+                                  stroke-dashoffset="251"/>
+                        </svg>
+                        <div class="risk-gauge__value">
+                            <div class="risk-gauge__number" id="riskScore">0</div>
+                            <div class="risk-gauge__label" id="riskLabel" style="color: #22c55e;">Low</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 12px;" id="riskSummaryText">
+                        Analyzing weather conditions...
+                    </p>
+                </div>
+            </section>
+
+            <!-- Risk Categories -->
+            <section class="section">
+                <div class="section__header">
+                    <span class="section__title">Risk Breakdown</span>
+                </div>
+                <div id="riskCategoriesContainer">
+                    <!-- Rendered by JS -->
+                </div>
+            </section>
+
+            <!-- Recommendations -->
+            <section class="section">
+                <div class="section__header">
+                    <span class="section__title">Recommendations</span>
+                </div>
+                <div id="recommendationsContainer">
+                    <!-- Rendered by JS -->
+                </div>
+            </section>
+
+            <!-- Travel Advisory -->
+            <section class="section">
+                <div class="section__header">
+                    <span class="section__title">Travel Advisory</span>
+                </div>
+                <div id="travelAdvisoryContainer">
+                    <!-- Rendered by JS -->
+                </div>
+            </section>
+
+            <!-- Download Report Button -->
+            <section class="section" style="margin-bottom: 32px;">
+                <button class="download-btn" id="downloadReportBtn">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Download Risk Report (PDF)</span>
+                </button>
+                <p style="text-align: center; font-size: 0.7rem; color: var(--color-text-tertiary); margin-top: 8px;">
+                    Report includes all risk data, recommendations, and travel advisory
+                </p>
+            </section>
+
+            <!-- Plan Trip CTA -->
+            <section class="section">
+                <a href="trip-planner.html" class="card card--highlight" style="display: flex; align-items: center; gap: 16px; padding: 20px; text-decoration: none; border-width: 2px;">
+                    <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, var(--color-accent), #1fa37f); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fa-solid fa-route" style="font-size: 1.2rem; color: #062c23;"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 700; font-size: 1rem; margin-bottom: 2px;">Plan Your Trip</div>
+                        <div style="font-size: 0.78rem; color: var(--color-text-secondary);">Get weather-based travel recommendations</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color: var(--color-text-secondary);"></i>
+                </a>
+            </section>
+        </main>
+
+        <!-- Settings Panel (same as index) -->
+        <div class="settings-overlay" id="settingsOverlay"></div>
+        <aside class="settings-panel" id="settingsPanel">
+            <div class="settings-panel__header">
+                <span class="settings-panel__title">Settings</span>
+                <button class="icon-btn" id="closeSettings" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item__label">Dark Mode</div>
+                    <div class="settings-item__desc">Use dark theme</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" class="toggle__input" id="themeToggle" checked>
+                    <span class="toggle__slider"></span>
+                </label>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item__label">Animations</div>
+                    <div class="settings-item__desc">Enable weather effects</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" class="toggle__input" id="animationsToggle" checked>
+                    <span class="toggle__slider"></span>
+                </label>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item__label">Auto Weather Theme</div>
+                    <div class="settings-item__desc">Theme follows weather conditions</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" class="toggle__input" id="autoThemeToggle" checked>
+                    <span class="toggle__slider"></span>
+                </label>
+            </div>
+        </aside>
+
+        <nav class="tab-bar">
+            <a href="index.html" class="tab-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="map.html" class="tab-item">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Map</span>
+            </a>
+            <a href="risk-report.html" class="tab-item active">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Risk</span>
+            </a>
+            <a href="trip-planner.html" class="tab-item">
+                <i class="fa-solid fa-route"></i>
+                <span>Trip</span>
+            </a>
+            <a href="search.html" class="tab-item">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Search</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- jsPDF for PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/particles.js"></script>
+    <script src="../js/weather-engine.js"></script>
+    <script src="../js/animation-engine.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/risk-engine.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/settings-handler.js"></script>
+    <script>
+        // Wait for app initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initRiskReport, 800);
+        });
+
+        function initRiskReport() {
+            // Get weather data
+            const cachedWeather = Storage.get(Storage.KEYS.LAST_WEATHER);
+            const riskReport = RiskEngine.analyzeRisks(cachedWeather);
+
+            // Update location
+            const locEl = document.getElementById('reportLocation');
+            if (locEl && riskReport.location) {
+                locEl.textContent = `${riskReport.location.name || 'San Francisco'} • Generated ${new Date().toLocaleTimeString()}`;
+            }
+
+            // Animate gauge
+            animateGauge(riskReport.overallScore, riskReport.overallLevel);
+
+            // Render risk categories
+            renderRiskCategories(riskReport.risks);
+
+            // Render recommendations
+            renderRecommendations(riskReport.recommendations);
+
+            // Render travel advisory
+            renderTravelAdvisory(riskReport.travelAdvisory);
+
+            // Summary text
+            const summaryEl = document.getElementById('riskSummaryText');
+            if (summaryEl) {
+                summaryEl.textContent = riskReport.travelAdvisory.summary;
+            }
+
+            // Download button
+            document.getElementById('downloadReportBtn').addEventListener('click', () => {
+                downloadReport(riskReport);
+            });
+        }
+
+        function animateGauge(score, level) {
+            const fill = document.getElementById('riskGaugeFill');
+            const scoreEl = document.getElementById('riskScore');
+            const labelEl = document.getElementById('riskLabel');
+
+            // Arc length = ~251px for the semicircle
+            const offset = 251 - (score / 100) * 251;
+            
+            setTimeout(() => {
+                fill.style.strokeDashoffset = offset;
+                fill.setAttribute('stroke', level.color);
+            }, 300);
+
+            // Animate number
+            let current = 0;
+            const increment = score / 40;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= score) {
+                    current = score;
+                    clearInterval(timer);
+                }
+                scoreEl.textContent = Math.round(current);
+            }, 25);
+
+            labelEl.textContent = level.label;
+            labelEl.style.color = level.color;
+        }
+
+        function renderRiskCategories(risks) {
+            const container = document.getElementById('riskCategoriesContainer');
+            if (!container) return;
+
+            const html = Object.values(risks).map(risk => {
+                const barWidth = (risk.level.value / 4) * 100;
+                return `
+                    <div class="risk-category reveal" style="margin-bottom: 12px;">
+                        <div class="risk-category__header">
+                            <div class="risk-category__icon" style="background: ${risk.level.color}20; color: ${risk.level.color};">
+                                <i class="fa-solid ${risk.icon}"></i>
+                            </div>
+                            <span class="risk-category__title">${risk.category}</span>
+                            <span class="risk-category__level" style="background: ${risk.level.color}20; color: ${risk.level.color};">${risk.level.label}</span>
+                        </div>
+                        <div class="risk-category__value">
+                            <span>${risk.value}${risk.unit ? ' ' + risk.unit : ''}</span>
+                        </div>
+                        <div class="risk-category__bar">
+                            <div class="risk-category__bar-fill" style="width: ${barWidth}%; background: ${risk.level.color};"></div>
+                        </div>
+                        <div class="risk-category__desc">${risk.description}</div>
+                        <div class="risk-category__advice">
+                            <i class="fa-solid fa-lightbulb" style="color: var(--color-accent); margin-right: 6px;"></i>
+                            ${risk.advice}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        function renderRecommendations(recommendations) {
+            const container = document.getElementById('recommendationsContainer');
+            if (!container) return;
+
+            const html = recommendations.map(rec => `
+                <div class="recommendation-item">
+                    <div class="recommendation-item__icon" style="background: ${rec.level.color}20; color: ${rec.level.color};">
+                        <i class="fa-solid ${rec.icon}"></i>
+                    </div>
+                    <div class="recommendation-item__content">
+                        <div class="recommendation-item__title">${rec.category}</div>
+                        <div class="recommendation-item__text">${rec.advice}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        function renderTravelAdvisory(advisory) {
+            const container = document.getElementById('travelAdvisoryContainer');
+            if (!container) return;
+
+            const packingHtml = advisory.packingList.map(item => `
+                <span class="packing-list__item">
+                    <i class="fa-solid fa-check"></i>
+                    ${item}
+                </span>
+            `).join('');
+
+            const detailsHtml = advisory.details.length > 0 
+                ? `<div style="margin-bottom: 16px;">
+                    ${advisory.details.map(d => `<div style="font-size: 0.78rem; color: var(--color-text-secondary); padding: 4px 0; border-bottom: 1px solid var(--glass-border);">• ${d}</div>`).join('')}
+                  </div>` 
+                : '';
+
+            container.innerHTML = `
+                <div class="travel-advisory">
+                    <div class="travel-advisory__header">
+                        <div class="travel-advisory__icon" style="background: ${advisory.level.color}20; color: ${advisory.level.color};">
+                            <i class="fa-solid fa-suitcase-rolling"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700;">Travel Advisory: ${advisory.level.label}</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-secondary);">Based on current conditions</div>
+                        </div>
+                    </div>
+                    <p class="travel-advisory__summary">${advisory.summary}</p>
+                    ${detailsHtml}
+                    <div style="margin-top: 12px;">
+                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 8px;">Suggested Packing</div>
+                        <div class="packing-list">${packingHtml}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadReport(riskReport) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const reportData = RiskEngine.generateReportData(riskReport);
+
+            // Header
+            doc.setFillColor(10, 10, 18);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(43, 212, 167);
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text('ClimateGuard', 20, 20);
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.text('Weather Risk Report', 20, 30);
+
+            // Meta info
+            doc.setTextColor(80, 80, 80);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            let y = 50;
+            doc.text(`Location: ${reportData.location}`, 20, y);
+            doc.text(`Generated: ${reportData.generatedAt}`, 20, y + 7);
+            
+            // Overall Risk
+            y += 22;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Overall Risk Assessment', 20, y);
+            y += 10;
+            doc.setFontSize(24);
+            const riskColor = getRiskPDFColor(reportData.overallRisk);
+            doc.setTextColor(riskColor.r, riskColor.g, riskColor.b);
+            doc.text(`${reportData.overallScore}/100 — ${reportData.overallRisk}`, 20, y);
+
+            // Risk Categories
+            y += 18;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Risk Breakdown', 20, y);
+            y += 8;
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            reportData.risks.forEach(risk => {
+                if (y > 260) {
+                    doc.addPage();
+                    y = 20;
+                }
+                const color = getRiskPDFColor(risk.level);
+                doc.setFillColor(color.r, color.g, color.b);
+                doc.circle(24, y - 1, 2, 'F');
+                doc.setTextColor(0, 0, 0);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${risk.category}: ${risk.value}`, 30, y);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(color.r, color.g, color.b);
+                doc.text(`[${risk.level}]`, 130, y);
+                y += 5;
+                doc.setTextColor(100, 100, 100);
+                doc.setFontSize(8);
+                const descLines = doc.splitTextToSize(risk.description, 160);
+                doc.text(descLines, 30, y);
+                y += descLines.length * 4 + 2;
+                const adviceLines = doc.splitTextToSize('→ ' + risk.advice, 160);
+                doc.setTextColor(43, 130, 100);
+                doc.text(adviceLines, 30, y);
+                y += adviceLines.length * 4 + 6;
+                doc.setFontSize(9);
+            });
+
+            // Recommendations
+            if (y > 230) { doc.addPage(); y = 20; }
+            y += 5;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Recommendations', 20, y);
+            y += 10;
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            reportData.recommendations.forEach(rec => {
+                if (y > 270) { doc.addPage(); y = 20; }
+                doc.setTextColor(0, 0, 0);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`• ${rec.category}`, 24, y);
+                y += 5;
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(80, 80, 80);
+                const lines = doc.splitTextToSize(rec.advice, 155);
+                doc.text(lines, 30, y);
+                y += lines.length * 4 + 4;
+            });
+
+            // Travel Advisory
+            if (y > 230) { doc.addPage(); y = 20; }
+            y += 5;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Travel Advisory', 20, y);
+            y += 10;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(80, 80, 80);
+            const summaryLines = doc.splitTextToSize(reportData.travelAdvisory.summary, 170);
+            doc.text(summaryLines, 20, y);
+            y += summaryLines.length * 5 + 6;
+
+            // Packing list
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Suggested Packing:', 20, y);
+            y += 6;
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(80, 80, 80);
+            reportData.travelAdvisory.packingList.forEach(item => {
+                doc.text(`  ✓ ${item}`, 24, y);
+                y += 5;
+            });
+
+            // Footer
+            y += 10;
+            doc.setTextColor(150, 150, 150);
+            doc.setFontSize(7);
+            doc.text('Generated by ClimateGuard Weather Risk Predictor', 20, y);
+            doc.text('This report is based on current weather data and is for informational purposes only.', 20, y + 4);
+
+            // Save
+            doc.save(`ClimateGuard_Risk_Report_${reportData.location.replace(/\s/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+
+            // Show notification
+            if (typeof UI !== 'undefined' && UI.showNotification) {
+                UI.showNotification('Risk report downloaded successfully!', 'success');
+            }
+        }
+
+        function getRiskPDFColor(level) {
+            const colors = {
+                'Low': { r: 34, g: 197, b: 94 },
+                'Moderate': { r: 234, g: 179, b: 8 },
+                'High': { r: 249, g: 115, b: 22 },
+                'Extreme': { r: 239, g: 68, b: 68 }
+            };
+            return colors[level] || colors['Low'];
+        }
+    </script>
+</body>
+</html>

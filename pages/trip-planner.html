@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a12">
+    <meta name="description" content="ClimateGuard - Plan your trip with weather risk analysis">
+    <title>ClimateGuard - Trip Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/base.css"><link rel="stylesheet" href="../css/layout.css"><link rel="stylesheet" href="../css/components.css"><link rel="stylesheet" href="../css/animations.css"><link rel="stylesheet" href="../css/themes.css"><link rel="stylesheet" href="../css/weather-effects.css"><link rel="stylesheet" href="../css/trip-planner.css"><link rel="stylesheet" href="../css/extended.css">
+</head>
+<body data-weather="clear_day">
+    <div class="weather-background"><div class="weather-background__sky"></div><div class="weather-background__clouds"></div><div class="weather-background__particles"><canvas id="particleCanvas"></canvas></div><div class="weather-background__effects"><div class="lightning"></div></div><div class="weather-background__overlay"></div></div>
+    <div class="app">
+        <nav class="navbar"><div class="navbar__logo"><i class="fa-solid fa-shield-halved navbar__logo-icon"></i><span>ClimateGuard</span></div><div class="navbar__center"><span id="currentTime">12:00 PM</span></div><div class="navbar__actions"><button class="icon-btn" id="settingsBtn" aria-label="Settings"><i class="fa-solid fa-gear"></i></button></div></nav>
+        <main class="main-content">
+            <div class="page-header"><h1 class="page-header__title"><i class="fa-solid fa-route" style="color:var(--color-accent);margin-right:8px"></i>Plan a Trip</h1><p class="page-header__subtitle">Get weather-based risk analysis for your travel</p></div>
+
+            <!-- Quick Destinations -->
+            <section class="section"><div class="section__header"><span class="section__title">Quick Destinations</span></div>
+                <div class="quick-destinations" id="quickDestinations">
+                    <button class="quick-dest" data-city="New York" data-lat="40.7128" data-lon="-74.0060">🗽 New York</button>
+                    <button class="quick-dest" data-city="London" data-lat="51.5074" data-lon="-0.1278">🇬🇧 London</button>
+                    <button class="quick-dest" data-city="Tokyo" data-lat="35.6762" data-lon="139.6503">🗼 Tokyo</button>
+                    <button class="quick-dest" data-city="Paris" data-lat="48.8566" data-lon="2.3522">🗼 Paris</button>
+                    <button class="quick-dest" data-city="Dubai" data-lat="25.2048" data-lon="55.2708">🏙️ Dubai</button>
+                    <button class="quick-dest" data-city="Sydney" data-lat="-33.8688" data-lon="151.2093">🦘 Sydney</button>
+                    <button class="quick-dest" data-city="Singapore" data-lat="1.3521" data-lon="103.8198">🇸🇬 Singapore</button>
+                    <button class="quick-dest" data-city="Mumbai" data-lat="19.0760" data-lon="72.8777">🇮🇳 Mumbai</button>
+                </div>
+            </section>
+
+            <!-- Trip Form -->
+            <section class="section">
+                <div class="card card--no-hover" style="padding:20px">
+                    <div class="card__header"><i class="fa-solid fa-plane-departure"></i><span>Trip Details</span></div>
+                    <div class="trip-form" id="tripForm">
+                        <div class="trip-form__group"><label class="trip-form__label">Destination</label><input type="text" class="trip-form__input" id="tripDestination" placeholder="Enter city name..."></div>
+                        <div class="trip-form__row">
+                            <div class="trip-form__group"><label class="trip-form__label">Start Date</label><input type="date" class="trip-form__input" id="tripStartDate"></div>
+                            <div class="trip-form__group"><label class="trip-form__label">End Date</label><input type="date" class="trip-form__input" id="tripEndDate"></div>
+                        </div>
+                        <div class="trip-form__group"><label class="trip-form__label">Trip Type</label>
+                            <select class="trip-form__input" id="tripType"><option value="leisure">🏖️ Leisure / Vacation</option><option value="business">💼 Business</option><option value="adventure">🏔️ Adventure / Outdoor</option><option value="family">👨‍👩‍👧‍👦 Family</option></select>
+                        </div>
+                        <button class="analyze-btn" id="analyzeBtn"><i class="fa-solid fa-magnifying-glass-chart"></i><span>Analyze Weather Risk</span></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trip Results -->
+            <div class="trip-results" id="tripResults" style="display:none">
+                <!-- Verdict Card -->
+                <section class="section"><div id="verdictCard"></div></section>
+                <!-- Trip Summary -->
+                <section class="section"><div class="trip-summary" id="tripSummary"></div></section>
+                <!-- Day by Day -->
+                <section class="section"><div class="section__header"><span class="section__title">Day-by-Day Forecast</span></div><div id="tripDaysContainer"></div></section>
+                <!-- Save Trip + Download -->
+                <section class="section" style="margin-bottom:32px">
+                    <button class="btn btn--primary btn--block mb-md" id="saveTripBtn"><i class="fa-solid fa-bookmark"></i> Save Trip & Set Reminder</button>
+                    <button class="download-btn" id="downloadTripBtn"><i class="fa-solid fa-file-pdf"></i><span>Download Trip Report (PDF)</span></button>
+                </section>
+            </div>
+        </main>
+
+        <div class="settings-overlay" id="settingsOverlay"></div>
+        <aside class="settings-panel" id="settingsPanel">
+            <div class="settings-panel__header"><span class="settings-panel__title">Settings</span><button class="icon-btn" id="closeSettings" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="settings-item"><div><div class="settings-item__label">Dark Mode</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="themeToggle" checked><span class="toggle__slider"></span></label></div>
+            <div class="settings-item"><div><div class="settings-item__label">Animations</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="animationsToggle" checked><span class="toggle__slider"></span></label></div>
+        </aside>
+
+        <nav class="tab-bar"><a href="index.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Home</span></a><a href="map.html" class="tab-item"><i class="fa-solid fa-map-location-dot"></i><span>Map</span></a><a href="risk-report.html" class="tab-item"><i class="fa-solid fa-triangle-exclamation"></i><span>Risk</span></a><a href="trip-planner.html" class="tab-item active"><i class="fa-solid fa-route"></i><span>Trip</span></a><a href="search.html" class="tab-item"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a></nav>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../js/config.js"></script><script src="../js/storage.js"></script><script src="../js/i18n.js"></script><script src="../js/api.js"></script><script src="../js/particles.js"></script><script src="../js/weather-engine.js"></script><script src="../js/animation-engine.js"></script><script src="../js/theme.js"></script><script src="../js/risk-engine.js"></script><script src="../js/ui.js"></script><script src="../js/app.js"></script><script src="../js/trip-planner.js"></script><script src="../js/settings-handler.js"></script>
+    <script>
+        let currentTripData = null;
+
+        document.getElementById('analyzeBtn').addEventListener('click', async function() {
+            const dest = document.getElementById('tripDestination').value.trim();
+            const start = document.getElementById('tripStartDate').value;
+            const end = document.getElementById('tripEndDate').value;
+            const type = document.getElementById('tripType').value;
+            if (!dest) { UI.showNotification('Please enter a destination', 'warning'); return; }
+            if (!start) { UI.showNotification('Please select a start date', 'warning'); return; }
+
+            this.innerHTML = '<div class="spinner-sm"></div> Analyzing...'; this.disabled = true;
+
+            try {
+                const results = await WeatherAPI.searchLocations(dest);
+                const loc = results[0];
+                if (!loc) { UI.showNotification('City not found', 'error'); this.innerHTML = '<i class="fa-solid fa-magnifying-glass-chart"></i><span>Analyze Weather Risk</span>'; this.disabled = false; return; }
+
+                const weather = await WeatherAPI.getCurrentWeather(loc.lat, loc.lon);
+                const risk = (typeof RiskEngine !== 'undefined') ? RiskEngine.analyzeRisks(weather) : { overallScore: 25, overallLevel: { label: 'Low', color: '#22c55e' } };
+
+                currentTripData = { city: loc.name, region: loc.region, lat: loc.lat, lon: loc.lon, start, end, type, weather, risk };
+
+                // Verdict
+                renderVerdict(risk, loc.name);
+
+                // Summary
+                const summary = document.getElementById('tripSummary');
+                if (summary) {
+                    summary.innerHTML = `<div class="card card--no-hover" style="padding:20px;text-align:center">
+                        <h3>${loc.name}</h3><p style="color:var(--color-text-secondary)">${loc.region || ''}</p>
+                        <div style="font-size:3rem;font-weight:200;margin:12px 0">${weather.weather?.temp || weather.temp || '—'}°</div>
+                        <p style="color:var(--color-text-secondary)">${start}${end ? ' → ' + end : ''} • ${type}</p>
+                        <div style="margin-top:12px"><span style="background:${risk.overallLevel?.color || '#22c55e'}20;color:${risk.overallLevel?.color || '#22c55e'};padding:4px 14px;border-radius:20px;font-weight:700;font-size:0.85rem">${risk.overallScore}/100 — ${risk.overallLevel?.label || 'Low'}</span></div>
+                    </div>`;
+                }
+
+                // Day by day (mock)
+                const days = document.getElementById('tripDaysContainer');
+                if (days) {
+                    const numDays = end ? Math.ceil((new Date(end) - new Date(start)) / 86400000) + 1 : 3;
+                    let html = '';
+                    for (let i = 0; i < Math.min(numDays, 7); i++) {
+                        const d = new Date(start); d.setDate(d.getDate() + i);
+                        const t = (weather.weather?.temp || 28) + Math.floor(Math.random() * 6 - 3);
+                        const r = Math.max(0, risk.overallScore + Math.floor(Math.random() * 20 - 10));
+                        const lvl = r < 30 ? { l: 'Low', c: '#22c55e' } : r < 60 ? { l: 'Moderate', c: '#eab308' } : r < 80 ? { l: 'High', c: '#f97316' } : { l: 'Extreme', c: '#ef4444' };
+                        html += `<div class="card" style="margin-bottom:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</strong><div style="font-size:0.8rem;color:var(--color-text-secondary)">Day ${i+1}</div></div><div style="text-align:right"><span style="font-size:1.3rem;font-weight:700">${t}°</span><span style="margin-left:8px;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:${lvl.c}20;color:${lvl.c}">${lvl.l}</span></div></div></div>`;
+                    }
+                    days.innerHTML = html;
+                }
+
+                document.getElementById('tripResults').style.display = '';
+                document.getElementById('tripResults').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                UI.showNotification('Error analyzing trip', 'error');
+                console.error(err);
+            }
+            this.innerHTML = '<i class="fa-solid fa-magnifying-glass-chart"></i><span>Analyze Weather Risk</span>'; this.disabled = false;
+        });
+
+        function renderVerdict(risk, city) {
+            const vc = document.getElementById('verdictCard');
+            if (!vc) return;
+            const score = risk.overallScore || 0;
+            let verdict, icon, cls, reasons;
+            if (score < 35) { verdict = 'Go!'; icon = '✅'; cls = 'verdict-card--go'; reasons = ['Weather conditions are favorable','Low risk across all categories','Great time to travel!']; }
+            else if (score < 65) { verdict = 'Caution'; icon = '⚠️'; cls = 'verdict-card--caution'; reasons = ['Some weather risks detected','Pack appropriate gear','Monitor weather updates']; }
+            else { verdict = 'Avoid'; icon = '🚫'; cls = 'verdict-card--avoid'; reasons = ['High weather risks detected','Consider postponing your trip','Dangerous conditions likely']; }
+            vc.innerHTML = `<div class="verdict-card ${cls}"><div class="verdict-card__icon">${icon}</div><div class="verdict-card__title">${verdict}</div><p style="color:var(--color-text-secondary)">${city} — Risk Score: ${score}/100</p><ul class="verdict-card__reasons">${reasons.map(r=>'<li>'+r+'</li>').join('')}</ul></div>`;
+        }
+
+        // Save trip
+        document.getElementById('saveTripBtn')?.addEventListener('click', () => {
+            if (!currentTripData) return;
+            Storage.saveTripReminder({ city: currentTripData.city, date: currentTripData.start, endDate: currentTripData.end, type: currentTripData.type, riskScore: currentTripData.risk?.overallScore });
+            UI.showNotification('Trip saved! Countdown started on Home page.', 'success');
+        });
+
+        // Quick destinations
+        document.querySelectorAll('.quick-dest').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('tripDestination').value = btn.dataset.city;
+                const today = new Date().toISOString().split('T')[0];
+                if (!document.getElementById('tripStartDate').value) document.getElementById('tripStartDate').value = today;
+            });
+        });
+
+        // Download PDF
+        document.getElementById('downloadTripBtn')?.addEventListener('click', () => {
+            if (!currentTripData) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFillColor(10,10,18); doc.rect(0,0,210,35,'F');
+            doc.setTextColor(43,212,167); doc.setFontSize(20); doc.text('ClimateGuard Trip Report',20,22);
+            doc.setTextColor(100,100,100); doc.setFontSize(10);
+            let y = 45;
+            doc.text(`Destination: ${currentTripData.city}`, 20, y);
+            doc.text(`Dates: ${currentTripData.start} → ${currentTripData.end || 'N/A'}`, 20, y+7);
+            doc.text(`Type: ${currentTripData.type}`, 20, y+14);
+            doc.text(`Risk Score: ${currentTripData.risk?.overallScore || '—'}/100 (${currentTripData.risk?.overallLevel?.label || '—'})`, 20, y+21);
+            doc.text(`Temperature: ${currentTripData.weather?.weather?.temp || '—'}°C`, 20, y+28);
+            doc.save(`ClimateGuard_Trip_${currentTripData.city}.pdf`);
+            UI.showNotification('Trip report downloaded!', 'success');
+        });
+    </script>
+</body>
+</html>

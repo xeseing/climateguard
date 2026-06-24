@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a12">
+    <meta name="description" content="ClimateGuard - Emergency Contacts & Global Emergency Numbers">
+    <title>ClimateGuard - Emergency Contacts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/base.css"><link rel="stylesheet" href="../css/layout.css"><link rel="stylesheet" href="../css/components.css"><link rel="stylesheet" href="../css/animations.css"><link rel="stylesheet" href="../css/themes.css"><link rel="stylesheet" href="../css/weather-effects.css"><link rel="stylesheet" href="../css/extended.css">
+</head>
+<body data-weather="clear_day">
+    <div class="weather-background"><div class="weather-background__sky"></div><div class="weather-background__clouds"></div><div class="weather-background__particles"><canvas id="particleCanvas"></canvas></div><div class="weather-background__effects"></div><div class="weather-background__overlay"></div></div>
+    <div class="app">
+        <nav class="navbar"><div class="navbar__logo"><i class="fa-solid fa-shield-halved navbar__logo-icon"></i><span>ClimateGuard</span></div><div class="navbar__center"><span>Emergency</span></div><div class="navbar__actions"><button class="icon-btn" onclick="window.location.href='index.html'" aria-label="Home"><i class="fa-solid fa-house"></i></button></div></nav>
+        <main class="main-content">
+            <div class="page-header"><h1 class="page-header__title"><i class="fa-solid fa-phone-volume" style="color:#ef4444;margin-right:8px"></i>Emergency Contacts</h1><p class="page-header__subtitle">Manage your emergency contacts & global emergency numbers</p></div>
+
+            <!-- Add Contact -->
+            <section class="section">
+                <div class="card card--no-hover" style="padding:20px">
+                    <div class="card__header"><i class="fa-solid fa-user-plus"></i><span>Add Emergency Contact</span></div>
+                    <input class="settings-input" id="contactName" placeholder="Name">
+                    <input class="settings-input" id="contactPhone" placeholder="Phone Number" type="tel">
+                    <input class="settings-input" id="contactRelation" placeholder="Relationship (e.g. Parent, Spouse)">
+                    <input class="settings-input" id="contactEmail" placeholder="Email (optional)" type="email">
+                    <button class="btn btn--primary btn--block mt-sm" id="addContactBtn"><i class="fa-solid fa-plus"></i> Add Contact</button>
+                </div>
+            </section>
+
+            <!-- Contact List -->
+            <section class="section">
+                <div class="section__header"><span class="section__title">My Contacts</span></div>
+                <div id="contactsList"></div>
+            </section>
+
+            <!-- Global Emergency Numbers -->
+            <section class="section">
+                <div class="section__header"><span class="section__title">Global Emergency Numbers</span></div>
+                <div class="card card--no-hover" style="padding:20px">
+                    <select class="settings-select mb-md" id="countrySelect"><option value="">— Select Country —</option></select>
+                    <div id="emergencyNumbers" style="display:none">
+                        <div class="global-emergency-grid">
+                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-shield-halved"></i> Police</div><div class="global-emergency-card__number" id="policeNum">—</div></div>
+                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-truck-medical"></i> Ambulance</div><div class="global-emergency-card__number" id="ambulanceNum">—</div></div>
+                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-fire-extinguisher"></i> Fire</div><div class="global-emergency-card__number" id="fireNum">—</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Share Location CTA -->
+            <section class="section">
+                <button class="btn btn--block mt-sm emergency-btn--location" id="shareLocationBtn" style="width:100%;padding:16px;border-radius:var(--radius-lg);font-size:0.95rem">
+                    <i class="fa-solid fa-location-arrow"></i> Share My Location via SMS
+                </button>
+                <p style="text-align:center;font-size:0.7rem;color:var(--color-text-tertiary);margin-top:8px">Opens your SMS app with your GPS coordinates</p>
+            </section>
+        </main>
+        <nav class="tab-bar"><a href="index.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Home</span></a><a href="map.html" class="tab-item"><i class="fa-solid fa-map-location-dot"></i><span>Map</span></a><a href="risk-report.html" class="tab-item"><i class="fa-solid fa-triangle-exclamation"></i><span>Risk</span></a><a href="trip-planner.html" class="tab-item"><i class="fa-solid fa-route"></i><span>Trip</span></a><a href="search.html" class="tab-item"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a></nav>
+    </div>
+    <script src="../js/config.js"></script><script src="../js/storage.js"></script><script src="../js/i18n.js"></script><script src="../js/api.js"></script><script src="../js/particles.js"></script><script src="../js/weather-engine.js"></script><script src="../js/animation-engine.js"></script><script src="../js/theme.js"></script><script src="../js/risk-engine.js"></script><script src="../js/ui.js"></script><script src="../js/app.js"></script><script src="../js/settings-handler.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => { setTimeout(initEmergency, 500); });
+
+        function initEmergency() {
+            renderContacts();
+            populateCountries();
+
+            document.getElementById('addContactBtn').addEventListener('click', () => {
+                const name = document.getElementById('contactName').value.trim();
+                const phone = document.getElementById('contactPhone').value.trim();
+                const relation = document.getElementById('contactRelation').value.trim();
+                const email = document.getElementById('contactEmail').value.trim();
+                if (!name || !phone) { UI.showNotification('Name and Phone required', 'warning'); return; }
+                Storage.saveEmergencyContact({ name, phone, relationship: relation, email });
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactPhone').value = '';
+                document.getElementById('contactRelation').value = '';
+                document.getElementById('contactEmail').value = '';
+                renderContacts();
+                UI.showNotification('Contact added!', 'success');
+            });
+
+            document.getElementById('countrySelect').addEventListener('change', e => {
+                const code = e.target.value;
+                const nums = CONFIG.EMERGENCY_NUMBERS[code];
+                const section = document.getElementById('emergencyNumbers');
+                if (nums && section) {
+                    document.getElementById('policeNum').textContent = nums.police;
+                    document.getElementById('ambulanceNum').textContent = nums.ambulance;
+                    document.getElementById('fireNum').textContent = nums.fire;
+                    section.style.display = '';
+                } else if (section) { section.style.display = 'none'; }
+            });
+
+            document.getElementById('shareLocationBtn').addEventListener('click', () => {
+                if (!navigator.geolocation) { UI.showNotification('Geolocation not supported', 'error'); return; }
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const { latitude: lat, longitude: lon } = pos.coords;
+                    const msg = `Emergency! My location: https://maps.google.com/?q=${lat},${lon}`;
+                    const contacts = Storage.getEmergencyContacts();
+                    if (contacts.length > 0) {
+                        window.open(`sms:${contacts[0].phone}?body=${encodeURIComponent(msg)}`);
+                    } else {
+                        window.open(`sms:?body=${encodeURIComponent(msg)}`);
+                    }
+                }, () => { UI.showNotification('Unable to get location', 'error'); }, { timeout: 5000 });
+            });
+        }
+
+        function renderContacts() {
+            const list = document.getElementById('contactsList');
+            const contacts = Storage.getEmergencyContacts();
+            if (!contacts.length) { list.innerHTML = '<p class="empty-state">No emergency contacts saved</p>'; return; }
+            list.innerHTML = contacts.map(c => `
+                <div class="emergency-contact-card">
+                    <div style="width:44px;height:44px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-user" style="color:#ef4444"></i></div>
+                    <div class="emergency-contact-card__info">
+                        <div class="emergency-contact-card__name">${c.name}</div>
+                        <div class="emergency-contact-card__detail">${c.relationship || ''} • ${c.phone}</div>
+                    </div>
+                    <div class="emergency-contact-card__actions">
+                        <a href="tel:${c.phone}" class="emergency-btn emergency-btn--call"><i class="fa-solid fa-phone"></i></a>
+                        <a href="sms:${c.phone}" class="emergency-btn emergency-btn--sms"><i class="fa-solid fa-message"></i></a>
+                        <button class="emergency-btn emergency-btn--danger" onclick="removeContact('${c.id}')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function removeContact(id) {
+            Storage.removeEmergencyContact(id);
+            renderContacts();
+            UI.showNotification('Contact removed', 'info');
+        }
+
+        function populateCountries() {
+            const sel = document.getElementById('countrySelect');
+            if (!sel || typeof CONFIG === 'undefined') return;
+            Object.entries(CONFIG.EMERGENCY_NUMBERS).forEach(([code, info]) => {
+                const opt = document.createElement('option');
+                opt.value = code; opt.textContent = info.label;
+                sel.appendChild(opt);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a12">
+    <title>ClimateGuard - Weekly Forecast</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/themes.css">
+    <link rel="stylesheet" href="../css/weather-effects.css">
+    <link rel="stylesheet" href="../css/extended.css">
+</head>
+<body data-weather="clear_day">
+    <div class="weather-background">
+        <div class="weather-background__sky"></div>
+        <div class="weather-background__clouds"></div>
+        <div class="weather-background__particles">
+            <canvas id="particleCanvas"></canvas>
+        </div>
+        <div class="weather-background__effects">
+            <div class="lightning"></div>
+        </div>
+        <div class="weather-background__overlay"></div>
+    </div>
+
+    <div class="app">
+        <nav class="navbar">
+            <div class="navbar__logo">
+                <i class="fa-solid fa-shield-halved navbar__logo-icon"></i>
+                <span>ClimateGuard</span>
+            </div>
+            <div class="navbar__center">
+                <span id="currentTime">12:00 PM</span>
+            </div>
+            <div class="navbar__actions">
+                <button class="icon-btn" onclick="window.location.href='search.html'">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-header__title">7-Day Forecast</h1>
+                <p class="page-header__subtitle">San Francisco • This week</p>
+            </div>
+
+            <div id="weeklyContainer" class="stagger-animation">
+                <!-- Weekly items rendered by JS -->
+            </div>
+        </main>
+
+        <nav class="tab-bar">
+            <a href="index.html" class="tab-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="map.html" class="tab-item">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Map</span>
+            </a>
+            <a href="risk-report.html" class="tab-item">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Risk</span>
+            </a>
+            <a href="trip-planner.html" class="tab-item">
+                <i class="fa-solid fa-route"></i>
+                <span>Trip</span>
+            </a>
+            <a href="search.html" class="tab-item">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Search</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/particles.js"></script>
+    <script src="../js/weather-engine.js"></script>
+    <script src="../js/animation-engine.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/risk-engine.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/app.js"></script>
+</body>
+</html>

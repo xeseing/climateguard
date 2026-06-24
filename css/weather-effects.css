@@ -1,0 +1,540 @@
+/**
+ * ClimateGuard - Weather Effects
+ * Dynamic backgrounds, particles, environmental rendering
+ */
+
+/* ===========================
+   WEATHER BACKGROUND CONTAINER
+=========================== */
+.weather-background {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-background);
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Sky Layer */
+.weather-background__sky {
+    position: absolute;
+    inset: 0;
+    transition: background 1s ease;
+}
+
+/* Cloud Layer */
+.weather-background__clouds {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+/* Particle Layer (Rain/Snow) */
+.weather-background__particles {
+    position: absolute;
+    inset: 0;
+}
+
+.weather-background__particles canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* Effects Layer (Lightning, Sun Rays) */
+.weather-background__effects {
+    position: absolute;
+    inset: 0;
+}
+
+/* Overlay Layer */
+.weather-background__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+    transition: opacity 0.5s ease;
+}
+
+/* ===========================
+   CLOUDS
+=========================== */
+.cloud {
+    position: absolute;
+    background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 0.9) 0%, 
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.3) 100%
+    );
+    border-radius: 100px;
+    filter: blur(2px);
+    opacity: 0.8;
+    animation: cloudDrift linear infinite;
+}
+
+body.light .cloud {
+    background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 0.5) 100%
+    );
+}
+
+/* Dark/Storm clouds */
+.cloud--dark {
+    background: linear-gradient(180deg, 
+        rgba(100, 116, 139, 0.9) 0%, 
+        rgba(71, 85, 105, 0.7) 50%,
+        rgba(51, 65, 85, 0.5) 100%
+    );
+}
+
+/* Cloud sizes */
+.cloud--small {
+    width: 100px;
+    height: 40px;
+}
+
+.cloud--medium {
+    width: 200px;
+    height: 70px;
+}
+
+.cloud--large {
+    width: 350px;
+    height: 100px;
+}
+
+.cloud--xlarge {
+    width: 500px;
+    height: 140px;
+}
+
+/* Cloud positions and animations */
+.cloud--1 {
+    top: 5%;
+    animation-duration: 60s;
+    animation-delay: -10s;
+}
+
+.cloud--2 {
+    top: 15%;
+    animation-duration: 80s;
+    animation-delay: -25s;
+}
+
+.cloud--3 {
+    top: 10%;
+    animation-duration: 70s;
+    animation-delay: -40s;
+}
+
+.cloud--4 {
+    top: 25%;
+    animation-duration: 90s;
+    animation-delay: -55s;
+}
+
+.cloud--5 {
+    top: 20%;
+    animation-duration: 75s;
+    animation-delay: -5s;
+}
+
+.cloud--6 {
+    top: 30%;
+    animation-duration: 85s;
+    animation-delay: -30s;
+}
+
+@keyframes cloudDrift {
+    from {
+        transform: translateX(-150%);
+    }
+    to {
+        transform: translateX(calc(100vw + 150%));
+    }
+}
+
+/* Parallax effect for layers */
+.cloud--layer-back {
+    opacity: 0.4;
+    transform: scale(0.6);
+    animation-duration: 120s !important;
+}
+
+.cloud--layer-mid {
+    opacity: 0.6;
+    transform: scale(0.8);
+}
+
+.cloud--layer-front {
+    opacity: 0.9;
+    filter: blur(0);
+}
+
+/* ===========================
+   SUN/MOON
+=========================== */
+.celestial-body {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Sun */
+.sun {
+    width: 120px;
+    height: 120px;
+    top: 10%;
+    right: 15%;
+    background: radial-gradient(circle, 
+        #fff9c4 0%, 
+        #ffee58 30%, 
+        #fdd835 60%, 
+        #f9a825 100%
+    );
+    box-shadow: 
+        0 0 60px 30px rgba(255, 235, 59, 0.3),
+        0 0 100px 60px rgba(255, 193, 7, 0.2),
+        0 0 140px 90px rgba(255, 152, 0, 0.1);
+    animation: sunPulse 4s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 60px 30px rgba(255, 235, 59, 0.3),
+            0 0 100px 60px rgba(255, 193, 7, 0.2),
+            0 0 140px 90px rgba(255, 152, 0, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 0 80px 40px rgba(255, 235, 59, 0.4),
+            0 0 120px 70px rgba(255, 193, 7, 0.25),
+            0 0 160px 100px rgba(255, 152, 0, 0.15);
+    }
+}
+
+/* Sun rays */
+.sun-rays {
+    position: absolute;
+    top: 10%;
+    right: 15%;
+    width: 120px;
+    height: 120px;
+    transform: translate(0, 0);
+}
+
+.sun-ray {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255, 235, 59, 0.5) 0%, transparent 100%);
+    transform-origin: 0 50%;
+    animation: rayRotate 20s linear infinite;
+}
+
+.sun-ray:nth-child(1) { transform: rotate(0deg); }
+.sun-ray:nth-child(2) { transform: rotate(30deg); animation-delay: -2s; }
+.sun-ray:nth-child(3) { transform: rotate(60deg); animation-delay: -4s; }
+.sun-ray:nth-child(4) { transform: rotate(90deg); animation-delay: -6s; }
+.sun-ray:nth-child(5) { transform: rotate(120deg); animation-delay: -8s; }
+.sun-ray:nth-child(6) { transform: rotate(150deg); animation-delay: -10s; }
+.sun-ray:nth-child(7) { transform: rotate(180deg); animation-delay: -12s; }
+.sun-ray:nth-child(8) { transform: rotate(210deg); animation-delay: -14s; }
+.sun-ray:nth-child(9) { transform: rotate(240deg); animation-delay: -16s; }
+.sun-ray:nth-child(10) { transform: rotate(270deg); animation-delay: -18s; }
+.sun-ray:nth-child(11) { transform: rotate(300deg); animation-delay: -20s; }
+.sun-ray:nth-child(12) { transform: rotate(330deg); animation-delay: -22s; }
+
+@keyframes rayRotate {
+    from { opacity: 0.3; }
+    50% { opacity: 0.6; }
+    to { opacity: 0.3; }
+}
+
+/* Moon */
+.moon {
+    width: 80px;
+    height: 80px;
+    top: 12%;
+    right: 18%;
+    background: radial-gradient(circle at 30% 30%, 
+        #f5f5f5 0%, 
+        #e0e0e0 50%, 
+        #bdbdbd 100%
+    );
+    box-shadow: 
+        0 0 40px 10px rgba(255, 255, 255, 0.2),
+        0 0 80px 30px rgba(255, 255, 255, 0.1),
+        inset -10px -10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Moon craters */
+.moon::before,
+.moon::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(158, 158, 158, 0.3);
+}
+
+.moon::before {
+    width: 15px;
+    height: 15px;
+    top: 20%;
+    left: 25%;
+}
+
+.moon::after {
+    width: 10px;
+    height: 10px;
+    top: 55%;
+    left: 50%;
+}
+
+/* ===========================
+   STARS
+=========================== */
+.stars {
+    position: absolute;
+    inset: 0;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: starTwinkle 2s ease-in-out infinite;
+}
+
+.star--small {
+    width: 1px;
+    height: 1px;
+    opacity: 0.5;
+}
+
+.star--large {
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes starTwinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Shooting star */
+.shooting-star {
+    position: absolute;
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, white 0%, transparent 100%);
+    transform: rotate(-45deg);
+    animation: shootingStar 3s ease-out infinite;
+    opacity: 0;
+}
+
+@keyframes shootingStar {
+    0% {
+        opacity: 0;
+        transform: rotate(-45deg) translateX(-200px);
+    }
+    10% {
+        opacity: 1;
+    }
+    30% {
+        opacity: 0;
+        transform: rotate(-45deg) translateX(400px);
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* ===========================
+   LIGHTNING
+=========================== */
+.lightning {
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.lightning.flash {
+    animation: lightningFlash 0.3s ease;
+}
+
+@keyframes lightningFlash {
+    0% { opacity: 0; }
+    10% { opacity: 0.8; }
+    20% { opacity: 0.2; }
+    30% { opacity: 0.9; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; }
+}
+
+/* Lightning bolt SVG container */
+.lightning-bolt {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 60%;
+    opacity: 0;
+    filter: drop-shadow(0 0 10px white) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+}
+
+.lightning-bolt.strike {
+    animation: boltStrike 0.5s ease;
+}
+
+@keyframes boltStrike {
+    0% { opacity: 0; }
+    5% { opacity: 1; }
+    15% { opacity: 0.3; }
+    25% { opacity: 1; }
+    40% { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+
+/* ===========================
+   FOG
+=========================== */
+.fog-layer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(203, 213, 225, 0.3) 20%,
+        rgba(203, 213, 225, 0.5) 50%,
+        rgba(203, 213, 225, 0.7) 80%,
+        rgba(203, 213, 225, 0.4) 100%
+    );
+    animation: fogDrift 30s ease-in-out infinite alternate;
+}
+
+.fog-layer--2 {
+    animation-delay: -15s;
+    animation-direction: alternate-reverse;
+    opacity: 0.5;
+}
+
+@keyframes fogDrift {
+    0% { transform: translateX(-5%) scale(1); }
+    100% { transform: translateX(5%) scale(1.05); }
+}
+
+/* Fog wisps */
+.fog-wisp {
+    position: absolute;
+    width: 300px;
+    height: 100px;
+    background: radial-gradient(ellipse, 
+        rgba(203, 213, 225, 0.4) 0%, 
+        transparent 70%
+    );
+    animation: wispFloat 20s ease-in-out infinite;
+}
+
+@keyframes wispFloat {
+    0%, 100% { 
+        transform: translateX(0) translateY(0); 
+        opacity: 0.3;
+    }
+    50% { 
+        transform: translateX(50px) translateY(-20px); 
+        opacity: 0.6;
+    }
+}
+
+/* ===========================
+   WIND PARTICLES
+=========================== */
+.wind-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.wind-particle {
+    position: absolute;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+    border-radius: 2px;
+    animation: windFlow 3s linear infinite;
+    opacity: 0;
+}
+
+@keyframes windFlow {
+    0% { 
+        transform: translateX(-100px); 
+        opacity: 0; 
+    }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { 
+        transform: translateX(calc(100vw + 100px)); 
+        opacity: 0; 
+    }
+}
+
+/* Wind particle variations */
+.wind-particle:nth-child(1) { top: 15%; animation-duration: 2.5s; animation-delay: 0s; }
+.wind-particle:nth-child(2) { top: 25%; animation-duration: 3s; animation-delay: 0.3s; }
+.wind-particle:nth-child(3) { top: 35%; animation-duration: 2.8s; animation-delay: 0.6s; }
+.wind-particle:nth-child(4) { top: 45%; animation-duration: 3.2s; animation-delay: 0.9s; }
+.wind-particle:nth-child(5) { top: 55%; animation-duration: 2.7s; animation-delay: 1.2s; }
+.wind-particle:nth-child(6) { top: 65%; animation-duration: 3.1s; animation-delay: 1.5s; }
+.wind-particle:nth-child(7) { top: 75%; animation-duration: 2.9s; animation-delay: 1.8s; }
+.wind-particle:nth-child(8) { top: 85%; animation-duration: 3.3s; animation-delay: 2.1s; }
+
+/* ===========================
+   WEATHER STATE VISIBILITY
+=========================== */
+[data-weather="clear_day"] .sun,
+[data-weather="clear_day"] .sun-rays { display: block; }
+
+[data-weather="clear_night"] .moon,
+[data-weather="clear_night"] .stars { display: block; }
+
+[data-weather="cloudy"] .cloud { opacity: 0.9; }
+
+[data-weather="rain"] .weather-background__particles { display: block; }
+[data-weather="rain"] .cloud--dark { display: block; }
+
+[data-weather="storm"] .weather-background__particles { display: block; }
+[data-weather="storm"] .lightning { display: block; }
+[data-weather="storm"] .cloud--dark { display: block; opacity: 1; }
+
+[data-weather="snow"] .weather-background__particles { display: block; }
+
+[data-weather="fog"] .fog-layer { display: block; }
+
+/* Hide elements by default */
+.sun, .sun-rays, .moon, .stars, .lightning, .fog-layer { display: none; }
+
+/* ===========================
+   REDUCED MOTION
+=========================== */
+@media (prefers-reduced-motion: reduce) {
+    .cloud,
+    .sun,
+    .moon,
+    .star,
+    .wind-particle,
+    .fog-layer,
+    .fog-wisp {
+        animation: none !important;
+    }
+    
+    .shooting-star {
+        display: none;
+    }
+}
