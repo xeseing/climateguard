@@ -222,20 +222,42 @@
     <script src="../js/app.js"></script>
     <script src="../js/settings-handler.js"></script>
     <script>
-        // Wait for app initialization
+        // Self-sufficient init: fetch fresh data directly (no fixed-delay race with App.init)
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(initRiskReport, 800);
+            initRiskReport().catch(err => {
+                console.error('Risk report init failed:', err);
+                const summaryEl = document.getElementById('riskSummaryText');
+                if (summaryEl) summaryEl.textContent = 'Could not load weather data. Please try again.';
+            });
         });
 
-        function initRiskReport() {
-            // Get weather data
-            const cachedWeather = Storage.get(Storage.KEYS.LAST_WEATHER);
-            const riskReport = RiskEngine.analyzeRisks(cachedWeather);
+        function coordsMatch(a, b) {
+            return a && b && Math.abs(a.lat - b.lat) < 0.5 && Math.abs(a.lon - b.lon) < 0.5;
+        }
 
-            // Update location
+        async function initRiskReport() {
+            // Fresh data for the current location; fall back to labelled cache, then demo
+            const savedLoc = Storage.get(Storage.KEYS.CURRENT_LOCATION);
+            let weather = null, source = 'demo';
+            if (savedLoc && isFinite(savedLoc.lat) && isFinite(savedLoc.lon)) {
+                try {
+                    const fresh = await WeatherAPI.getCurrentWeather(savedLoc.lat, savedLoc.lon);
+                    // getCurrentWeather may return SF mock data on failure — only trust matching coords
+                    if (fresh && coordsMatch(fresh.location, savedLoc)) { weather = fresh; source = 'live'; }
+                } catch { /* fall through to cache */ }
+            }
+            if (!weather) {
+                const cached = Storage.get(Storage.KEYS.LAST_WEATHER);
+                if (cached) { weather = cached; source = 'cached'; }
+            }
+            const riskReport = RiskEngine.analyzeRisks(weather);
+
+            // Update location with data provenance
             const locEl = document.getElementById('reportLocation');
             if (locEl && riskReport.location) {
-                locEl.textContent = `${riskReport.location.name || 'San Francisco'} • Generated ${new Date().toLocaleTimeString()}`;
+                const dataTime = weather && weather.timestamp ? new Date(weather.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+                const provenance = source === 'live' ? `Updated ${dataTime}` : source === 'cached' ? `Cached data from ${dataTime}` : 'Demo data';
+                locEl.textContent = `${riskReport.location.name || 'San Francisco'} • ${provenance}`;
             }
 
             // Animate gauge

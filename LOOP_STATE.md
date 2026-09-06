@@ -36,7 +36,7 @@
 | BUG-06 | 🟠 | Trip planner double-binding: `trip-planner.js` + page inline script both handle `#analyzeBtn` → double render / conflicting output, `#verdictCard` only in one path | ✅ FIXED | `npm test` (trip-bindings) + lint |
 | BUG-07 | 🟡 | `getCurrentLocation()` swallows denial errors, resolves SF fallback → "Use Current Location" silently teleports user to San Francisco | ✅ FIXED | `npm test` (geolocation) + lint |
 | BUG-08 | 🟡 | `searchLocations()` returns `[]` with no API key instead of local-DB fallback → search dead offline/keyless | ✅ FIXED | `npm test` (search-fallback) + lint |
-| BUG-09 | 🟡 | Risk report race: page waits fixed 800 ms then reads possibly-stale/missing `LAST_WEATHER` cache, silently falls back to SF mock | TODO | — |
+| BUG-09 | 🟡 | Risk report race: page waits fixed 800 ms then reads possibly-stale/missing `LAST_WEATHER` cache, silently falls back to SF mock | ✅ FIXED | `npm test` (risk-report) + lint |
 | BUG-10 | 🟡 | Map layer buttons (temp/wind/precip/clouds) only swap the legend — no actual tile-layer change; all 30 city markers are hardcoded static fake data | TODO | — |
 | BUG-11 | 🟡 | `particles.js` snow color hack produces invalid 5-component `rgba()` → `fillStyle` assignment ignored (snow renders wrong/invisible) | TODO | — |
 | BUG-12 | 🟡 | `index.html` precipitation card hardcoded `0 mm` + `initCharts` hardcoded fake `[5,8,12,…]` data; compass needle + humidity gauge never update | TODO | — |
@@ -105,7 +105,12 @@
 - **Verify:** `npm test` 44/44 (4 new `search-fallback` tests: local match, region/country match, unknown → `[]`, short query); `npm run lint` clean.
 - **Files:** `js/api.js`, `tests/search-fallback.test.js`, `tests/api-key.test.js`
 
-*(next: BUG-09)*
+### BUG-09 — Self-sufficient risk report ✅ FIXED (attempt 1)
+- **Change:** `risk-report.html` init is now async and fetches fresh data for `CURRENT_LOCATION` directly (800 ms race removed; API session cache dedups with `App.loadWeather`). Results accepted only when returned coords match the request (rejects SF-mock substitution); otherwise labelled `LAST_WEATHER` cache, otherwise "Demo data". Subtitle shows provenance (`Updated…` / `Cached data from…` / `Demo data`).
+- **Verify:** `npm test` 47/47 (3 new `risk-report` tests: fresh-beats-stale, labelled cache fallback, demo label); `npm run lint` clean.
+- **Files:** `pages/risk-report.html`, `tests/risk-report.test.js`
+
+*(next: BUG-10)*
 
 ---
 
