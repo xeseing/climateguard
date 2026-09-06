@@ -54,8 +54,13 @@ const App = (function() {
             } else {
                 const settings = Storage.getSettings();
                 if (settings.gpsEnabled) {
-                    const coords = await WeatherAPI.getCurrentLocation();
-                    state.currentLocation = coords;
+                    try {
+                        state.currentLocation = await WeatherAPI.getCurrentLocation();
+                    } catch (err) {
+                        console.warn('GPS unavailable, using default location:', err);
+                        state.currentLocation = { lat: 37.7749, lon: -122.4194 };
+                        UI.showNotification('Location unavailable — showing default location', 'warning');
+                    }
                 } else {
                     state.currentLocation = { lat: 37.7749, lon: -122.4194 };
                 }

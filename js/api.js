@@ -353,8 +353,9 @@ const WeatherAPI = (function () {
             navigator.geolocation.getCurrentPosition(
                 pos => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
                 err => {
-                    console.warn('Geolocation error:', err);
-                    resolve({ lat: 37.7749, lon: -122.4194 }); // fallback SF
+                    const error = new Error('Location unavailable: ' + (err && err.message ? err.message : 'unknown error'));
+                    error.code = err && err.code;
+                    reject(error); // never silently substitute a location — callers decide
                 },
                 { timeout: 10000, enableHighAccuracy: true }
             );
