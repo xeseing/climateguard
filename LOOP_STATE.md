@@ -39,7 +39,7 @@
 | BUG-09 | 🟡 | Risk report race: page waits fixed 800 ms then reads possibly-stale/missing `LAST_WEATHER` cache, silently falls back to SF mock | ✅ FIXED | `npm test` (risk-report) + lint |
 | BUG-10 | 🟡 | Map layer buttons (temp/wind/precip/clouds) only swap the legend — no actual tile-layer change; all 30 city markers are hardcoded static fake data | ✅ FIXED | `npm test` (map-layers) + lint |
 | BUG-11 | 🟡 | `particles.js` snow color hack produces invalid 5-component `rgba()` → `fillStyle` assignment ignored (snow renders wrong/invisible) | ✅ FIXED | `npm test` (particles) + lint |
-| BUG-12 | 🟡 | `index.html` precipitation card hardcoded `0 mm` + `initCharts` hardcoded fake `[5,8,12,…]` data; compass needle + humidity gauge never update | TODO | — |
+| BUG-12 | 🟡 | `index.html` precipitation card hardcoded `0 mm` + `initCharts` hardcoded fake `[5,8,12,…]` data; compass needle + humidity gauge never update | ✅ FIXED | `npm test` (ui-weather-display) + lint |
 | BUG-13 | 🟡 | i18n largely non-functional: only ~1 `data-i18n` attribute in the whole app; language switcher translates almost nothing | TODO | — |
 | BUG-14 | 🟡 | PDF downloads (`risk-report`, `compare`, `trip`) assume `window.jspdf` exists → TypeError crash if CDN blocked | TODO | — |
 | BUG-15 | 🟡 | `renderPopularDestinations` fires 6 **sequential** API calls on every home load (slow, no error state) | TODO | — |
@@ -120,7 +120,12 @@
 - **Verify:** `npm test` 53/53 (2 new `particles` tests: single-frame render asserts every string fill matches valid `rgba()`, alpha varies); `npm run lint` clean.
 - **Files:** `js/particles.js`, `tests/particles.test.js`
 
-*(next: BUG-12)*
+### BUG-12 — Live home-card values ✅ FIXED (attempt 1)
+- **Change:** `UI.updateWeatherDisplay` now drives precip value, compass-needle rotation, humidity-gauge arc, pressure-gauge arc (same staleness pattern, included), and Magnus dew point; `initCharts(hourly)` renders real hourly labels/precip (no data → no chart, never fake). New element IDs in `index.html`; `initCharts` exposed for testability.
+- **Verify:** `npm test` 59/59 (6 new `ui-weather-display` tests); `npm run lint` clean.
+- **Files:** `js/ui.js`, `js/app.js`, `pages/index.html`, `tests/ui-weather-display.test.js`
+
+*(next: BUG-13)*
 
 ---
 

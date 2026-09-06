@@ -163,7 +163,7 @@ const App = (function() {
     async function initHomePage() {
         const hourly = await WeatherAPI.getHourlyForecast(state.currentLocation?.lat, state.currentLocation?.lon);
         UI.renderHourlyForecast(hourly);
-        initCharts();
+        initCharts(hourly);
         if (typeof AnimationEngine !== 'undefined') AnimationEngine.setupCardHoverEffects();
         setupAutoThemeToggle();
         renderPopularDestinations();
@@ -200,12 +200,14 @@ const App = (function() {
         if (typeof AnimationEngine !== 'undefined') AnimationEngine.setupCardHoverEffects();
     }
 
-    function initCharts() {
+    function initCharts(hours) {
         const ctx = document.getElementById('precipChart');
         if (!ctx || typeof Chart === 'undefined') return;
+        const points = (hours || []).slice(0, 6);
+        if (!points.length) return; // no data → no chart (never fake values)
         new Chart(ctx, {
             type: 'bar',
-            data: { labels: ['12PM','1PM','2PM','3PM','4PM','5PM'], datasets: [{ data: [5,8,12,25,15,10], backgroundColor: 'rgba(43,212,167,0.6)', borderRadius: 4, barThickness: 12 }] },
+            data: { labels: points.map(h => h.timeFormatted), datasets: [{ data: points.map(h => h.precipitation ?? 0), backgroundColor: 'rgba(43,212,167,0.6)', borderRadius: 4, barThickness: 12 }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, max: 100 } } }
         });
     }
@@ -481,6 +483,7 @@ const App = (function() {
         init, loadWeather, refreshWeather, setDemoWeather,
         removeTrip, selectLocation, renderTripCountdowns,
         renderSearchResults, renderRecentSearches,
+        initCharts,
         getState: () => ({ ...state })
     };
 })();

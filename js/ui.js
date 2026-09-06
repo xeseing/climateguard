@@ -64,6 +64,29 @@ const UI = (function() {
         setText('feelsLikeValue', (w.feelsLike ?? '—') + '°');
         setText('pressureValue', w.pressure ?? '—');
         setText('visibilityValue', (w.visibility ?? '—') + ' km');
+        setText('precipValue', w.precipitation == null ? '—' : w.precipitation + ' mm');
+
+        // Compass needle rotation
+        const needle = document.getElementById('compassNeedle');
+        if (needle && w.windDegree != null) needle.style.transform = `rotate(${w.windDegree}deg)`;
+
+        // Humidity gauge arc (path length 126)
+        const humArc = document.getElementById('humidityGaugeArc');
+        if (humArc && w.humidity != null) humArc.style.strokeDashoffset = (126 * (1 - w.humidity / 100)).toFixed(1);
+
+        // Pressure gauge arc (980–1040 hPa mapped to full arc)
+        const pressArc = document.getElementById('pressureGaugeArc');
+        if (pressArc && w.pressure != null) {
+            const ratio = Math.max(0, Math.min(1, (w.pressure - 980) / 60));
+            pressArc.style.strokeDashoffset = (126 * (1 - ratio)).toFixed(1);
+        }
+
+        // Dew point (Magnus formula)
+        if (w.temp != null && w.humidity != null && w.humidity > 0) {
+            const a = 17.27, b = 237.7;
+            const gamma = (a * w.temp) / (b + w.temp) + Math.log(w.humidity / 100);
+            setText('dewPointValue', Math.round((b * gamma) / (a - gamma)) + '°');
+        }
 
         // Update date
         const dateEl = document.getElementById('currentDate');
