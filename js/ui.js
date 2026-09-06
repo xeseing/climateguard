@@ -123,6 +123,56 @@ const UI = (function() {
         }).join('');
     }
 
+    // ─── HTML ESCAPING (XSS-safe interpolation) ────────────────
+    function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // ─── HOURLY / WEEKLY LIST PAGES ────────────────────────────
+    function buildHourlyListHTML(hours) {
+        if (!hours || !hours.length) return '<p class="empty-state">No hourly data available</p>';
+        return hours.map((h, i) => {
+            const icon = h.isSunrise ? 'fa-sunrise' : (h.isSunset ? 'fa-sunset' : (h.conditionIcon || 'fa-sun'));
+            const label = i === 0 ? 'Now' : escapeHtml(h.timeFormatted);
+            const precip = (h.precipitation ?? 0) > 0 ? ` • 💧 ${escapeHtml(h.precipitation)}%` : '';
+            return `<div class="list-item">` +
+                `<div class="list-item__icon"><i class="fa-solid ${escapeHtml(icon)}"></i></div>` +
+                `<div class="list-item__content"><div class="list-item__title">${label}</div>` +
+                `<div class="list-item__subtitle">${escapeHtml(h.conditionText || h.condition || '')}${precip}</div></div>` +
+                `<div class="list-item__value">${escapeHtml(h.temp ?? '—')}°</div></div>`;
+        }).join('');
+    }
+
+    function buildWeeklyListHTML(days) {
+        if (!days || !days.length) return '<p class="empty-state">No weekly data available</p>';
+        return days.map(d => {
+            const icon = d.conditionIcon || 'fa-sun';
+            return `<div class="list-item">` +
+                `<div class="list-item__icon"><i class="fa-solid ${escapeHtml(icon)}"></i></div>` +
+                `<div class="list-item__content"><div class="list-item__title">${escapeHtml(d.dayName)}</div>` +
+                `<div class="list-item__subtitle">${escapeHtml(d.conditionText || d.condition || '')} • 💧 ${escapeHtml(d.precipitation ?? 0)}% • UV ${escapeHtml(d.uvIndex ?? '—')}</div></div>` +
+                `<div class="list-item__value">${escapeHtml(d.tempHigh ?? '—')}° / ${escapeHtml(d.tempLow ?? '—')}°</div></div>`;
+        }).join('');
+    }
+
+    function renderHourlyList(hours) {
+        const container = document.getElementById('hourlyList');
+        if (!container) return;
+        container.innerHTML = buildHourlyListHTML(hours);
+    }
+
+    function renderWeeklyList(days) {
+        const container = document.getElementById('weeklyContainer');
+        if (!container) return;
+        container.innerHTML = buildWeeklyListHTML(days);
+    }
+
     // ─── NOTIFICATIONS ───────────────────────────────────────
     function showNotification(message, type = 'info') {
         const existing = document.querySelector('.notification');
@@ -174,6 +224,7 @@ const UI = (function() {
 
     return {
         init, openSettings, updateWeatherDisplay, renderHourlyForecast,
-        showNotification, showLoading, hideLoading, setText
+        renderHourlyList, renderWeeklyList, buildHourlyListHTML, buildWeeklyListHTML,
+        escapeHtml, showNotification, showLoading, hideLoading, setText
     };
 })();

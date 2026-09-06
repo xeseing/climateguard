@@ -1,0 +1,13 @@
+{
+  "name": "climateguard",
+  "version": "6.0.0",
+  "description": "ClimateGuard - Weather Risk Predictor & Trip Planner",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "lint": "node scripts/lint.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

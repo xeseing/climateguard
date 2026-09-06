@@ -137,6 +137,8 @@ const App = (function() {
         const page = getCurrentPage();
         switch (page) {
             case 'index': initHomePage(); break;
+            case 'hourly': initHourlyPage(); break;
+            case 'weekly': initWeeklyPage(); break;
             case 'search': initSearchPage(); break;
             case 'trip-planner': break; // handled by trip-planner.js
             case 'risk-report': break;
@@ -161,6 +163,36 @@ const App = (function() {
         setupAutoThemeToggle();
         renderPopularDestinations();
         renderTripCountdowns();
+    }
+
+    // ─── HOURLY / WEEKLY PAGES ─────────────────────────────────
+    function currentCoords() {
+        return {
+            lat: state.currentLocation?.lat ?? state.weatherData?.location?.lat,
+            lon: state.currentLocation?.lon ?? state.weatherData?.location?.lon
+        };
+    }
+
+    function updatePageSubtitle(suffix) {
+        const sub = document.querySelector('.page-header__subtitle');
+        const name = state.weatherData?.location?.name;
+        if (sub && name) sub.textContent = `${name} • ${suffix}`;
+    }
+
+    async function initHourlyPage() {
+        const { lat, lon } = currentCoords();
+        const hours = await WeatherAPI.getHourlyForecast(lat, lon);
+        UI.renderHourlyList(hours);
+        updatePageSubtitle('Next 24 hours');
+        if (typeof AnimationEngine !== 'undefined') AnimationEngine.setupCardHoverEffects();
+    }
+
+    async function initWeeklyPage() {
+        const { lat, lon } = currentCoords();
+        const days = await WeatherAPI.getWeeklyForecast(lat, lon);
+        UI.renderWeeklyList(days);
+        updatePageSubtitle('This week');
+        if (typeof AnimationEngine !== 'undefined') AnimationEngine.setupCardHoverEffects();
     }
 
     function initCharts() {

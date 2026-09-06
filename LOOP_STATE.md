@@ -1,0 +1,93 @@
+# LOOP_STATE.md — ClimateGuard Verification-Driven Loop
+
+> Autonomous loop tracker. Every fix is verified by tests/linters before being marked complete.
+> Max 5 attempts per issue. No bulk unverified changes.
+
+- **Repo:** `xeseing/climateguard` (static multi-page site: `pages/`, `js/`, `css/`, no build step)
+- **Branch:** `arena/01a0790a-climateguard`
+- **Stack:** Vanilla JS (IIFE globals) + Leaflet/Chart.js/jsPDF via CDN. No package.json, no tests (until this loop).
+- **Last updated:** 2026-09-06 — Phase 0/1 (audit) complete, harness initialized, Phase 2 in progress.
+
+---
+
+## PHASE 0 — Audit summary
+
+| Area | Result |
+|---|---|
+| JS syntax (`node --check`, 13 files) | ✅ all pass |
+| HTML pages (8 in `pages/`) | ⚠️ 2 dead/orphan (hourly, weekly); no root `index.html` |
+| CSS hooks for JS-rendered classes | ✅ mostly present; `.offline-banner`, `.api-error-card` missing |
+| Tests / lint / CI | ❌ none (added in Phase 1) |
+| Deps | CDN-only: FontAwesome, Chart.js, jsPDF, Leaflet, Google Fonts |
+
+---
+
+## PHASE 1 — Bug / gap register
+
+**Severity:** 🔴 critical · 🟠 high · 🟡 medium · 🔵 low
+
+| ID | Sev | Title | Status | Verified |
+|---|---|---|---|---|
+| BUG-01 | 🔴 | `hourly.html` / `weekly.html` are dead AND orphan: no render logic (no `app.js` page handler, no inline JS) and zero inbound links | ✅ FIXED | `npm test` (ui-render) + `node --check` + link grep |
+| BUG-02 | 🟠 | `getWeeklyForecast()` ignores lat/lon, always returns random mock data presented as a real forecast | TODO | — |
+| BUG-03 | 🟠 | Deprecated OWM UV endpoint (`/data/2.5/uvi` retired) → UV silently falls back to hardcoded `6` | TODO | — |
+| BUG-04 | 🟠 | Stored/reflected XSS via `innerHTML`: trip city, search results, compare cities, emergency contacts, popular cities (no escaping anywhere) | TODO | — |
+| BUG-05 | 🟠 | Hardcoded OpenWeatherMap API key in `js/config.js` (committed secret) | TODO | — |
+| BUG-06 | 🟠 | Trip planner double-binding: `trip-planner.js` + page inline script both handle `#analyzeBtn` → double render / conflicting output, `#verdictCard` only in one path | TODO | — |
+| BUG-07 | 🟡 | `getCurrentLocation()` swallows denial errors, resolves SF fallback → "Use Current Location" silently teleports user to San Francisco | TODO | — |
+| BUG-08 | 🟡 | `searchLocations()` returns `[]` with no API key instead of local-DB fallback → search dead offline/keyless | TODO | — |
+| BUG-09 | 🟡 | Risk report race: page waits fixed 800 ms then reads possibly-stale/missing `LAST_WEATHER` cache, silently falls back to SF mock | TODO | — |
+| BUG-10 | 🟡 | Map layer buttons (temp/wind/precip/clouds) only swap the legend — no actual tile-layer change; all 30 city markers are hardcoded static fake data | TODO | — |
+| BUG-11 | 🟡 | `particles.js` snow color hack produces invalid 5-component `rgba()` → `fillStyle` assignment ignored (snow renders wrong/invisible) | TODO | — |
+| BUG-12 | 🟡 | `index.html` precipitation card hardcoded `0 mm` + `initCharts` hardcoded fake `[5,8,12,…]` data; compass needle + humidity gauge never update | TODO | — |
+| BUG-13 | 🟡 | i18n largely non-functional: only ~1 `data-i18n` attribute in the whole app; language switcher translates almost nothing | TODO | — |
+| BUG-14 | 🟡 | PDF downloads (`risk-report`, `compare`, `trip`) assume `window.jspdf` exists → TypeError crash if CDN blocked | TODO | — |
+| BUG-15 | 🟡 | `renderPopularDestinations` fires 6 **sequential** API calls on every home load (slow, no error state) | TODO | — |
+| BUG-16 | 🔵 | No root `index.html` / redirect — static hosts serving repo root show nothing | TODO | — |
+| BUG-17 | 🔵 | Theme applied twice (`Theme.init` + `settings-handler` direct DOM manipulation, bypassing `Theme.applyTheme`) | TODO | — |
+| BUG-18 | 🔵 | `Storage.getSettings()` returns live `DEFAULT_SETTINGS` reference when empty (mutation risk); `units` setting dead (no UI/conversion) | TODO | — |
+| BUG-19 | 🔵 | Missing CSS: `.offline-banner`, `.api-error-card` (JS injects them unstyled); `Notification.icon: '🌤️'` invalid | TODO | — |
+| BUG-20 | 🔵 | `getHourlyForecast(undefined, undefined)` builds `lat=undefined` URL (caught, but sloppy); `mapCond('Clouds')` never yields `partly_cloudy` | TODO | — |
+
+**Architectural notes (feed Phase 3):** no PWA manifest/service worker despite offline claims; per-page script-tag soup (13 tags, order-sensitive globals); mock data silently substituted for live data in several paths — should be badged "demo data" when used.
+
+---
+
+## PHASE 1 — Test harness
+
+- `package.json` — `npm test` → `node --test tests/`, `npm run lint` → `node --check` over `js/` + inline `<script>` extraction check per page.
+- `tests/helpers.js` — minimal browser stubs (`localStorage`, `sessionStorage`, `document`, `window`, `navigator`) + module loader for IIFE scripts.
+- `tests/risk-engine.test.js` — baseline RiskEngine contract tests (pure logic, pre-existing behavior locked in).
+- `tests/ui-render.test.js` — BUG-01 builders + escaping.
+- Baseline: all green before Phase 2 fixes begin.
+
+---
+
+## PHASE 2 — Fix log (one-by-one, verified)
+
+### BUG-01 — Dead hourly/weekly pages ✅ FIXED (attempt 1)
+- **Change:** `js/ui.js` += `escapeHtml`, `buildHourlyListHTML`, `buildWeeklyListHTML`, `renderHourlyList`, `renderWeeklyList`; `js/app.js` += `initHourlyPage`/`initWeeklyPage` routing + subtitle update; `pages/index.html` hourly card header += "View 24h →" link, hero date row += "7-Day Forecast →" link.
+- **Verify:** `npm test` 15/15 pass (`tests/risk-engine` 8 + `tests/ui-render` 7); `npm run lint` clean; grep confirms inbound links to `hourly.html`/`weekly.html`.
+- **Files:** `js/ui.js`, `js/app.js`, `pages/index.html`, `tests/ui-render.test.js`
+
+*(next: BUG-02)*
+
+---
+
+## PHASE 3 — UI/UX & feature roadmap (not started)
+
+1. Badge mock/demo data wherever fallback data is shown (honest UI).
+2. Real OWM tile layers on map + live marker data.
+3. Units toggle (°C/°F) wiring (resolves dead `units` setting).
+4. PWA manifest + service worker (offline-first for static shell).
+5. Root landing (`index.html` redirect or move).
+6. i18n attribute pass over all pages (needs BUG-13 first).
+7. Design polish: skeleton loaders, empty states, focus styles.
+
+---
+
+## Verification protocol (per RULES)
+
+1. `npm test` must pass; `npm run lint` must pass.
+2. Each fix: implement → test → record above. On failure: read log, self-correct, re-test (≤5 attempts).
+3. One bug per change-set; never multi-file speculative edits (coupled files for a single bug are one change-set).
