@@ -138,6 +138,7 @@ const UI = (function() {
     function renderHourlyForecast(hours) {
         const container = document.getElementById('hourlyContainer');
         if (!container || !hours) return;
+        container.setAttribute('aria-busy', 'false');
         container.innerHTML = hours.slice(0, 24).map((h, i) => {
             const cls = i === 0 ? 'hourly-item now' : (h.isSunset ? 'hourly-item sunset' : 'hourly-item');
             const label = i === 0 ? 'Now' : h.timeFormatted;
@@ -187,13 +188,43 @@ const UI = (function() {
     function renderHourlyList(hours) {
         const container = document.getElementById('hourlyList');
         if (!container) return;
+        container.setAttribute('aria-busy', 'false');
         container.innerHTML = buildHourlyListHTML(hours);
     }
 
     function renderWeeklyList(days) {
         const container = document.getElementById('weeklyContainer');
         if (!container) return;
+        container.setAttribute('aria-busy', 'false');
         container.innerHTML = buildWeeklyListHTML(days);
+    }
+
+    // ─── SKELETON LOADERS + EMPTY STATES ───────────────────────
+    function resolveEl(idOrEl) {
+        if (!idOrEl) return null;
+        return (typeof idOrEl === 'string') ? document.getElementById(idOrEl) : idOrEl;
+    }
+
+    function showSkeleton(idOrEl, rows = 3, variant = 'row') {
+        const container = resolveEl(idOrEl);
+        if (!container) return;
+        const n = Math.max(1, Math.min(12, rows | 0 || 3));
+        const cls = variant === 'card' ? 'skeleton skeleton--card' : 'skeleton skeleton--row';
+        container.innerHTML = Array.from({ length: n }, () => `<div class="${cls}" aria-hidden="true"></div>`).join('');
+        container.setAttribute('aria-busy', 'true');
+    }
+
+    function emptyHTML(icon, title, hint) {
+        return `<div class="empty-state"><i class="fa-solid ${escapeHtml(icon || 'fa-circle-info')}"></i>` +
+            `<p>${escapeHtml(title || 'Nothing here yet')}</p>` +
+            (hint ? `<p class="empty-state__hint">${escapeHtml(hint)}</p>` : '') + `</div>`;
+    }
+
+    function renderEmpty(idOrEl, opts = {}) {
+        const container = resolveEl(idOrEl);
+        if (!container) return;
+        container.setAttribute('aria-busy', 'false');
+        container.innerHTML = emptyHTML(opts.icon, opts.title, opts.hint);
     }
 
     // ─── NOTIFICATIONS ───────────────────────────────────────
@@ -248,6 +279,7 @@ const UI = (function() {
     return {
         init, openSettings, updateWeatherDisplay, renderHourlyForecast,
         renderHourlyList, renderWeeklyList, buildHourlyListHTML, buildWeeklyListHTML,
-        escapeHtml, showNotification, showLoading, hideLoading, setText
+        escapeHtml, showNotification, showLoading, hideLoading, setText,
+        showSkeleton, emptyHTML, renderEmpty
     };
 })();

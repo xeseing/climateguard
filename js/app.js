@@ -186,6 +186,7 @@ const App = (function() {
 
     async function initHourlyPage() {
         const { lat, lon } = currentCoords();
+        UI.showSkeleton('hourlyList', 8);
         const hours = await WeatherAPI.getHourlyForecast(lat, lon);
         UI.renderHourlyList(hours);
         updatePageSubtitle('Next 24 hours');
@@ -194,6 +195,7 @@ const App = (function() {
 
     async function initWeeklyPage() {
         const { lat, lon } = currentCoords();
+        UI.showSkeleton('weeklyContainer', 7);
         const days = await WeatherAPI.getWeeklyForecast(lat, lon);
         UI.renderWeeklyList(days);
         updatePageSubtitle('This week');
@@ -216,6 +218,7 @@ const App = (function() {
     async function renderPopularDestinations() {
         const container = document.getElementById('popularDestinations');
         if (!container) return;
+        UI.showSkeleton(container, 6, 'card');
         const cities = [
             { name: 'Tokyo', lat: 35.67, lon: 139.65 }, { name: 'London', lat: 51.50, lon: -0.12 },
             { name: 'Dubai', lat: 25.20, lon: 55.27 }, { name: 'New York', lat: 40.71, lon: -74.00 },
@@ -236,6 +239,7 @@ const App = (function() {
                 return `<div class="popular-dest-card"><div class="popular-dest-card__city">${c.name}</div><div class="popular-dest-card__temp">—</div></div>`;
             }
         }));
+        container.setAttribute('aria-busy', 'false');
         container.innerHTML = cards.join('');
     }
 
@@ -325,7 +329,7 @@ const App = (function() {
             const q = e.target.value.trim();
             if (q.length < 2) { if (results) results.innerHTML = ''; return; }
             timeout = setTimeout(async () => {
-                if (results) results.innerHTML = '<div class="search-loading"><div class="spinner-sm"></div> Searching...</div>';
+                if (results) UI.showSkeleton(results, 4);
                 const res = await WeatherAPI.searchLocations(q);
                 renderSearchResults(res, results);
             }, 300);
@@ -364,7 +368,14 @@ const App = (function() {
 
     function renderSearchResults(results, container) {
         if (!container) return;
-        if (!results.length) { container.innerHTML = '<p style="color:var(--color-text-secondary);padding:16px">No results found</p>'; return; }
+        if (!results.length) {
+            container.setAttribute('aria-busy', 'false');
+            container.innerHTML = (typeof UI !== 'undefined' && UI.emptyHTML)
+                ? UI.emptyHTML('fa-magnifying-glass', 'No results found', 'Try a different spelling or a larger nearby city')
+                : '<p class="empty-state">No results found</p>';
+            return;
+        }
+        container.setAttribute('aria-busy', 'false');
         const esc = (typeof UI !== 'undefined' && UI.escapeHtml) ? UI.escapeHtml : String;
         container.innerHTML = results.map(loc => `
             <div class="list-item" data-lat="${loc.lat}" data-lon="${loc.lon}" data-name="${esc(loc.name)}" data-region="${esc(loc.region || '')}">

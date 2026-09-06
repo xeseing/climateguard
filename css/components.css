@@ -669,6 +669,17 @@
     border-radius: 50%;
 }
 
+.skeleton--row {
+    height: 64px;
+    margin-bottom: var(--space-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton {
+        animation: none;
+    }
+}
+
 /* ===========================
    NOTIFICATIONS
 =========================== */

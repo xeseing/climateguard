@@ -175,15 +175,19 @@
 
 ---
 
-## PHASE 3 — UI/UX & feature roadmap (not started)
+## PHASE 3 — UI/UX & feature roadmap (IN PROGRESS — Steps 1–2 ordered first)
 
-1. Badge mock/demo data wherever fallback data is shown (honest UI).
-2. Real OWM tile layers on map + live marker data.
-3. Units toggle (°C/°F) wiring (resolves dead `units` setting).
-4. PWA manifest + service worker (offline-first for static shell).
-5. Root landing (`index.html` redirect or move).
-6. i18n attribute pass over all pages (needs BUG-13 first).
-7. Design polish: skeleton loaders, empty states, focus styles.
+1. Badge mock/demo data wherever fallback data is shown (honest UI). [QUEUED — Step 3, after report-back]
+2. ~~Real OWM tile layers on map + live marker data.~~ ✅ DONE in Phase 2 (BUG-10).
+3. Units toggle (°C/°F) wiring (resolves dead `units` setting). [✅ STEP 1 DONE — see below]
+4. PWA manifest + service worker (offline-first for static shell). [QUEUED — Step 4, after report-back]
+5. ~~Root landing (`index.html` redirect or move).~~ ✅ DONE in Phase 2 (BUG-16).
+6. i18n attribute pass over all pages (needs BUG-13 first). [open]
+7. Design polish: skeleton loaders, empty states, focus styles. [STEP 2 IN PROGRESS — see below]
+
+### Step 1 — Unit Toggling & State Sync ✅ DONE (commits `d0d2c57`, `e2bf800`)
+- **Change:** new `js/units.js` (`Units.get/set/display/symbol/format`, `cg_units_v1`, `unitschange` event; display-only, internals stay °C); loaded on all 9 pages. Wired: hero/high-low/feels/dew (`ui.js`), hourly strip+lists, weekly lists, popular cards (`app.js`), compare table+radar, trip summary+day-cards+PDF, map markers+info, risk heat-value+PDF, settings Temperature toggles on index/risk-report/trip-planner via `settings-handler.js` (checked=Celsius, reload to re-render).
+- **Verify:** `npm test` **99/99** (16 new `units` tests: 6 core + 4 dash wiring + 6 inline/panels); `npm run lint` clean. Fixture notes: heat fixture = feels-like 37°C→99°F; old fixtures touching Units paths needed `units.js` loads (risk-report, xss, pdf-guards).
 
 ---
 
