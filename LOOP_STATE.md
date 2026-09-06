@@ -42,7 +42,7 @@
 | BUG-12 | 🟡 | `index.html` precipitation card hardcoded `0 mm` + `initCharts` hardcoded fake `[5,8,12,…]` data; compass needle + humidity gauge never update | ✅ FIXED | `npm test` (ui-weather-display) + lint |
 | BUG-13 | 🟡 | i18n largely non-functional: only ~1 `data-i18n` attribute in the whole app; language switcher translates almost nothing | ✅ FIXED | `npm test` (i18n-coverage) + lint |
 | BUG-14 | 🟡 | PDF downloads (`risk-report`, `compare`, `trip`) assume `window.jspdf` exists → TypeError crash if CDN blocked | ✅ FIXED | `npm test` (pdf-guards) + lint |
-| BUG-15 | 🟡 | `renderPopularDestinations` fires 6 **sequential** API calls on every home load (slow, no error state) | TODO | — |
+| BUG-15 | 🟡 | `renderPopularDestinations` fires 6 **sequential** API calls on every home load (slow, no error state) | ✅ FIXED | `npm test` (popular-dest) + lint |
 | BUG-16 | 🔵 | No root `index.html` / redirect — static hosts serving repo root show nothing | TODO | — |
 | BUG-17 | 🔵 | Theme applied twice (`Theme.init` + `settings-handler` direct DOM manipulation, bypassing `Theme.applyTheme`) | TODO | — |
 | BUG-18 | 🔵 | `Storage.getSettings()` returns live `DEFAULT_SETTINGS` reference when empty (mutation risk); `units` setting dead (no UI/conversion) | TODO | — |
@@ -135,7 +135,12 @@
 - **Verify:** `npm test` 67/67 (4 new `pdf-guards` tests: 3 graceful-degradation + 1 positive save-path); `npm run lint` clean.
 - **Files:** `pages/risk-report.html`, `pages/compare.html`, `pages/trip-planner.html`, `tests/pdf-guards.test.js`
 
-*(next: BUG-15)*
+### BUG-15 — Parallel destination loading ✅ FIXED (attempt 1)
+- **Change:** `renderPopularDestinations` now fetches all 6 cities via one `Promise.all` (order-preserving, per-card error tolerance kept); exposed on `App` for testability.
+- **Verify:** `npm test` 69/69 (2 new `popular-dest` tests: 6-in-flight concurrency probe, 6 cards render); `npm run lint` clean.
+- **Files:** `js/app.js`, `tests/popular-dest.test.js`
+
+*(next: BUG-16)*
 
 ---
 

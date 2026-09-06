@@ -221,23 +221,22 @@ const App = (function() {
             { name: 'Dubai', lat: 25.20, lon: 55.27 }, { name: 'New York', lat: 40.71, lon: -74.00 },
             { name: 'Mumbai', lat: 19.07, lon: 72.87 }, { name: 'Sydney', lat: -33.86, lon: 151.20 }
         ];
-        let html = '';
-        for (const c of cities) {
+        const cards = await Promise.all(cities.map(async (c) => {
             try {
                 const d = await WeatherAPI.getCurrentWeather(c.lat, c.lon);
                 const risk = (typeof RiskEngine !== 'undefined') ? RiskEngine.analyzeRisks(d) : null;
                 const level = risk ? risk.overallLevel : { label: 'Low', color: '#22c55e' };
                 const temp = d?.weather?.temp ?? '—';
-                html += `<div class="popular-dest-card" aria-label="${c.name} weather">
+                return `<div class="popular-dest-card" aria-label="${c.name} weather">
                     <div class="popular-dest-card__city">${c.name}</div>
                     <div class="popular-dest-card__temp">${temp}°</div>
                     <span class="popular-dest-card__badge" style="background:${level.color}20;color:${level.color}">${level.label}</span>
                 </div>`;
             } catch {
-                html += `<div class="popular-dest-card"><div class="popular-dest-card__city">${c.name}</div><div class="popular-dest-card__temp">—</div></div>`;
+                return `<div class="popular-dest-card"><div class="popular-dest-card__city">${c.name}</div><div class="popular-dest-card__temp">—</div></div>`;
             }
-        }
-        container.innerHTML = html;
+        }));
+        container.innerHTML = cards.join('');
     }
 
     // ─── TRIP COUNTDOWNS ─────────────────────────────────────
@@ -483,7 +482,7 @@ const App = (function() {
         init, loadWeather, refreshWeather, setDemoWeather,
         removeTrip, selectLocation, renderTripCountdowns,
         renderSearchResults, renderRecentSearches,
-        initCharts,
+        renderPopularDestinations, initCharts,
         getState: () => ({ ...state })
     };
 })();
