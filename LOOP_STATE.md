@@ -183,11 +183,15 @@
 4. PWA manifest + service worker (offline-first for static shell). [QUEUED — Step 4, after report-back]
 5. ~~Root landing (`index.html` redirect or move).~~ ✅ DONE in Phase 2 (BUG-16).
 6. i18n attribute pass over all pages (needs BUG-13 first). [open]
-7. Design polish: skeleton loaders, empty states, focus styles. [STEP 2 IN PROGRESS — see below]
+7. Design polish: skeleton loaders, empty states, focus styles. [✅ STEP 2 DONE — see below]
 
 ### Step 1 — Unit Toggling & State Sync ✅ DONE (commits `d0d2c57`, `e2bf800`)
 - **Change:** new `js/units.js` (`Units.get/set/display/symbol/format`, `cg_units_v1`, `unitschange` event; display-only, internals stay °C); loaded on all 9 pages. Wired: hero/high-low/feels/dew (`ui.js`), hourly strip+lists, weekly lists, popular cards (`app.js`), compare table+radar, trip summary+day-cards+PDF, map markers+info, risk heat-value+PDF, settings Temperature toggles on index/risk-report/trip-planner via `settings-handler.js` (checked=Celsius, reload to re-render).
 - **Verify:** `npm test` **99/99** (16 new `units` tests: 6 core + 4 dash wiring + 6 inline/panels); `npm run lint` clean. Fixture notes: heat fixture = feels-like 37°C→99°F; old fixtures touching Units paths needed `units.js` loads (risk-report, xss, pdf-guards).
+
+### Step 2 — Skeletons, Micro-interactions, Responsive Polish ✅ DONE (commits `69a1efb`, `d5d1463`)
+- **Change:** new `UI.showSkeleton(id|el, rows=3, variant)` + `UI.emptyHTML`/`UI.renderEmpty` (XSS-escaped); renderers clear `aria-busy` on paint; wired into hourly/weekly/search/popular async paths (replaces blocking spinner line in search). CSS: `.skeleton--row`, `prefers-reduced-motion` guard, `.hero-temp` fluid `clamp(4.5rem,22vw,8rem)` (replaces fixed 8rem inline style), `.tab-item:active` press states, 360px breakpoint, `.empty-state` icon/hint styles. Test-helper `makeEl` now stores attributes (`set/get/removeAttribute`).
+- **Verify:** `npm test` **111/111** (7 new `skeletons` + 5 new `polish` tests); `npm run lint` clean.
 
 ---
 
