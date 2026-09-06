@@ -46,7 +46,7 @@
 | BUG-16 | 🔵 | No root `index.html` / redirect — static hosts serving repo root show nothing | ✅ FIXED | `npm test` (root-index) + lint |
 | BUG-17 | 🔵 | Theme applied twice (`Theme.init` + `settings-handler` direct DOM manipulation, bypassing `Theme.applyTheme`) | ✅ FIXED | `npm test` (theme-single-source) + lint |
 | BUG-18 | 🔵 | `Storage.getSettings()` returns live `DEFAULT_SETTINGS` reference when empty (mutation risk); `units` setting dead (no UI/conversion → Phase 3 item 3) | ✅ FIXED | `npm test` (storage-settings) + lint |
-| BUG-19 | 🔵 | Missing CSS: `.offline-banner`, `.api-error-card` (JS injects them unstyled); `Notification.icon: '🌤️'` invalid | TODO | — |
+| BUG-19 | 🔵 | Missing CSS: `.offline-banner`, `.api-error-card` (JS injects them unstyled); `Notification.icon: '🌤️'` invalid | ✅ FIXED | `npm test` (offline-ui) + lint |
 | BUG-20 | 🔵 | ~~`lat=undefined` URL guard~~ (done in BUG-02); `mapCond('Clouds')` never yields `partly_cloudy` | TODO | — |
 
 **Architectural notes (feed Phase 3):** no PWA manifest/service worker despite offline claims; per-page script-tag soup (13 tags, order-sensitive globals); mock data silently substituted for live data in several paths — should be badged "demo data" when used.
@@ -155,7 +155,12 @@
 - **Verify:** `npm test` 76/76 (3 new `storage-settings` tests: mutation isolation, partial merge, update round-trip); `npm run lint` clean.
 - **Files:** `js/storage.js`, `tests/storage-settings.test.js`
 
-*(next: BUG-19)*
+### BUG-19 — Offline/error styling + valid Notifications ✅ FIXED (attempt 3; attempts 1–2 = test sandbox stubs for canvas/CustomEvent)
+- **Change:** added `.offline-banner` / `.api-error-card` styles to `components.css`; `fireNotification` no longer passes the invalid emoji `icon`.
+- **Verify:** `npm test` 79/79 (3 new `offline-ui` tests: 2 CSS-rule assertions + full index boot asserting the fired Notification has no `icon` key); `npm run lint` clean.
+- **Files:** `css/components.css`, `js/app.js`, `tests/offline-ui.test.js`
+
+*(next: BUG-20)*
 
 ---
 

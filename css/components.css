@@ -732,6 +732,48 @@
 }
 
 /* ===========================
+   OFFLINE BANNER + API ERROR
+   (injected by app.js)
+=========================== */
+.offline-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(234, 179, 8, 0.12);
+    border-bottom: 1px solid rgba(234, 179, 8, 0.35);
+    color: #fbbf24;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.api-error-card {
+    margin: 16px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 16px;
+}
+
+.api-error-card i {
+    font-size: 1.6rem;
+    color: #ef4444;
+    margin-bottom: 8px;
+}
+
+.api-error-card h3 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+}
+
+.api-error-card p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+/* ===========================
    HOURLY FORECAST ITEMS
 =========================== */
 .hourly-item {
