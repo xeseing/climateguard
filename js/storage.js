@@ -39,7 +39,13 @@ const Storage = (function() {
         notif_dailyForecast: false, notif_emergencyAlerts: true
     };
 
-    function getSettings() { return get(KEYS.SETTINGS, DEFAULT_SETTINGS); }
+    // Fresh merged copy every call: callers can never mutate DEFAULT_SETTINGS,
+    // and partial/corrupt stored settings heal against current defaults.
+    function getSettings() {
+        const stored = get(KEYS.SETTINGS, null);
+        const safe = (stored && typeof stored === 'object') ? stored : {};
+        return { ...DEFAULT_SETTINGS, ...safe };
+    }
     function updateSettings(s) { const c = getSettings(); const u = { ...c, ...s }; set(KEYS.SETTINGS, u); return u; }
 
     function addRecentLocation(loc, max = 5) {
