@@ -65,52 +65,52 @@
 
 ## PHASE 2 — Fix log (one-by-one, verified)
 
-### BUG-01 — Dead hourly/weekly pages ✅ FIXED (attempt 1)
+### BUG-01 — Dead hourly/weekly pages ✅ FIXED (attempt 1 · commit `07dc695`)
 - **Change:** `js/ui.js` += `escapeHtml`, `buildHourlyListHTML`, `buildWeeklyListHTML`, `renderHourlyList`, `renderWeeklyList`; `js/app.js` += `initHourlyPage`/`initWeeklyPage` routing + subtitle update; `pages/index.html` hourly card header += "View 24h →" link, hero date row += "7-Day Forecast →" link.
 - **Verify:** `npm test` 15/15 pass (`tests/risk-engine` 8 + `tests/ui-render` 7); `npm run lint` clean; grep confirms inbound links to `hourly.html`/`weekly.html`.
 - **Files:** `js/ui.js`, `js/app.js`, `pages/index.html`, `tests/ui-render.test.js`
 
-### BUG-02 — Real weekly forecast aggregation ✅ FIXED (attempt 2; attempt 1 = test-fixture date spill)
+### BUG-02 — Real weekly forecast aggregation ✅ FIXED (attempt 2 · commit `e9f7c74`; attempt 1 = test-fixture date spill)
 - **Change:** `js/api.js`: `getWeeklyForecast(lat, lon)` now fetches `/forecast?cnt=40`, groups into UTC-day summaries via `aggregateDaily()` (high/low, dominant condition, max precip, avg humidity, `uvIndex: null` = unknown); per-coords cache + mock fallback; `validCoords()` guard added to both forecast fns (no more `lat=undefined` URLs).
 - **Verify:** `npm test` 20/20 (5 new `api-forecast` tests); `npm run lint` clean.
 - **Files:** `js/api.js`, `tests/api-forecast.test.js`
 
-### BUG-03 — Working UV source (Open-Meteo) ✅ FIXED (attempt 1)
+### BUG-03 — Working UV source (Open-Meteo) ✅ FIXED (attempt 1 · commit `365dcd8`)
 - **Change:** `js/api.js` `getCurrentWeather()`: UV now fetched from Open-Meteo `current=uv_index` (keyless); retired `/data/2.5/uvi` call removed. On failure `uvIndex` is `null` (UI renders `—`) instead of fabricated `6`. Downstream safe: `UI.getUVLevel(null)` → `—`, `RiskEngine` keeps its documented `|| 6` modeling default.
 - **Verify:** `npm test` 22/22 (2 new `api-current` tests: rounding/URL assertions, null-on-failure); `npm run lint` clean.
 - **Files:** `js/api.js`, `tests/api-current.test.js`
 
-### BUG-04 — XSS remediation ✅ FIXED (attempt 1)
+### BUG-04 — XSS remediation ✅ FIXED (attempt 1 · commit `8a5f322`)
 - **Change:** all user/API-controlled strings escaped via `UI.escapeHtml` at `innerHTML` sinks: `app.js` trip countdowns, recent + search results; `compare.html` city cells; `emergency.html` contact fields; `trip-planner.html` summary + verdict. Inline `onclick="…${id}…"` handlers replaced with `data-*-id` + delegated listeners (escaping alone is unsafe in handler attributes). Phone numbers whitelisted (`sanitizePhone`) before `tel:`/`sms:` hrefs. `App` now exposes the three render fns for testability. Static-DB sinks (popular cities, map markers) audited — not user-controlled, left as-is.
 - **Verify:** `npm test` 28/28 (6 new `xss` tests incl. inline page-script loading); `npm run lint` clean; grep confirms zero interpolated inline handlers / raw phone hrefs.
 - **Files:** `js/app.js`, `pages/compare.html`, `pages/emergency.html`, `pages/trip-planner.html`, `tests/helpers.js`, `tests/xss.test.js`
 
-### BUG-05 — Committed API secret removed ✅ FIXED (attempt 2; attempt 1 = fixtures relied on embedded key)
+### BUG-05 — Committed API secret removed ✅ FIXED (attempt 2 · commit `d5caf7b`; attempt 1 = fixtures relied on embedded key)
 - **Change:** `js/config.js` `API_KEY` default is now `''` with runtime-override docs; `getApiKey()` resolves `localStorage 'climateguard_api_key'` → `window.CLIMATEGUARD_API_KEY` → config default. Added `.gitignore` for `js/config.local.js`. Older fixtures updated to seed the override seam. NOTE: keyless installs run on mock data + (after BUG-08) local search DB; Phase 3 should add a settings UI field for the key.
 - **Verify:** `npm test` 32/32 (4 new `api-key` tests incl. secret-scan regression); `npm run lint` clean.
 - **Files:** `js/config.js`, `js/api.js`, `.gitignore`, `tests/api-key.test.js`, `tests/api-current.test.js`, `tests/api-forecast.test.js`
 
-### BUG-06 — Single trip-page owner ✅ FIXED (attempt 1)
+### BUG-06 — Single trip-page owner ✅ FIXED (attempt 1 · commit `bd723e9`)
 - **Change:** removed `<script src="../js/trip-planner.js">` from `trip-planner.html` (inline script is the single owner of `#analyzeBtn`/`#downloadTripBtn`/`.quick-dest`); ported default-date prefill (today → +7d) into the inline script; deleted now-dead `js/trip-planner.js` (symbols self-contained — verified by grep). Test helpers gained listener recording, `loadPageScripts`, `fireDOMContentLoaded`, `countListeners`.
 - **Verify:** `npm test` 36/36 (4 new `trip-bindings` tests: no module include, exactly-1 listener ×2, date defaults); `npm run lint` clean.
 - **Files:** `pages/trip-planner.html`, `js/trip-planner.js` (deleted), `tests/helpers.js`, `tests/trip-bindings.test.js`
 
-### BUG-07 — Honest geolocation errors ✅ FIXED (attempt 1)
+### BUG-07 — Honest geolocation errors ✅ FIXED (attempt 1 · commit `fbade42`)
 - **Change:** `getCurrentLocation()` now rejects with a `Location unavailable…` error (code preserved) instead of resolving SF coords. `loadWeather()` catches GPS failure explicitly → default location + warning notification; the search-page "Use Current Location" button already had try/catch → now correctly shows its error toast.
 - **Verify:** `npm test` 40/40 (4 new `geolocation` tests: success, denial rejection, unsupported, `loadWeather` fallback); `npm run lint` clean.
 - **Files:** `js/api.js`, `js/app.js`, `tests/geolocation.test.js`
 
-### BUG-08 — Keyless search via bundled DB ✅ FIXED (attempt 1)
+### BUG-08 — Keyless search via bundled DB ✅ FIXED (attempt 1 · commit `b75c024`)
 - **Change:** `searchLocations()` returns `searchLocalDB(q)` when no API key is configured (previously `[]`). `api-key.test.js` "no fetch" case updated to an unknown place (Paris now correctly resolves locally).
 - **Verify:** `npm test` 44/44 (4 new `search-fallback` tests: local match, region/country match, unknown → `[]`, short query); `npm run lint` clean.
 - **Files:** `js/api.js`, `tests/search-fallback.test.js`, `tests/api-key.test.js`
 
-### BUG-09 — Self-sufficient risk report ✅ FIXED (attempt 1)
+### BUG-09 — Self-sufficient risk report ✅ FIXED (attempt 1 · commit `c5b38b7`)
 - **Change:** `risk-report.html` init is now async and fetches fresh data for `CURRENT_LOCATION` directly (800 ms race removed; API session cache dedups with `App.loadWeather`). Results accepted only when returned coords match the request (rejects SF-mock substitution); otherwise labelled `LAST_WEATHER` cache, otherwise "Demo data". Subtitle shows provenance (`Updated…` / `Cached data from…` / `Demo data`).
 - **Verify:** `npm test` 47/47 (3 new `risk-report` tests: fresh-beats-stale, labelled cache fallback, demo label); `npm run lint` clean.
 - **Files:** `pages/risk-report.html`, `tests/risk-report.test.js`
 
-### BUG-10 — Live map layers + markers ✅ FIXED (attempt 1)
+### BUG-10 — Live map layers + markers ✅ FIXED (attempt 1 · commit `4f3d47c`)
 - **Change:** `map.html` now loads `storage`/`api`/`risk-engine`; layer buttons swap real OWM tile overlays (`temp/wind/precipitation/clouds_new`); `CITIES` slimmed to name+coords with live `getCurrentWeather` per city (pool of 6, cached) and `RiskEngine` risk; keyless installs fetch nothing, show `—` markers + demo badge, and disable layer buttons. Risk zones use live data. (Closes Phase 3 roadmap item 2.)
 - **Verify:** `npm test` 51/51 (4 new `map-layers` tests with Leaflet stub: overlay URL, live temps, layer swap + legend, keyless honesty); `npm run lint` clean.
 - **Files:** `pages/map.html`, `tests/map-layers.test.js`
