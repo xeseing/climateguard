@@ -38,7 +38,7 @@
 | BUG-08 | 🟡 | `searchLocations()` returns `[]` with no API key instead of local-DB fallback → search dead offline/keyless | ✅ FIXED | `npm test` (search-fallback) + lint |
 | BUG-09 | 🟡 | Risk report race: page waits fixed 800 ms then reads possibly-stale/missing `LAST_WEATHER` cache, silently falls back to SF mock | ✅ FIXED | `npm test` (risk-report) + lint |
 | BUG-10 | 🟡 | Map layer buttons (temp/wind/precip/clouds) only swap the legend — no actual tile-layer change; all 30 city markers are hardcoded static fake data | ✅ FIXED | `npm test` (map-layers) + lint |
-| BUG-11 | 🟡 | `particles.js` snow color hack produces invalid 5-component `rgba()` → `fillStyle` assignment ignored (snow renders wrong/invisible) | TODO | — |
+| BUG-11 | 🟡 | `particles.js` snow color hack produces invalid 5-component `rgba()` → `fillStyle` assignment ignored (snow renders wrong/invisible) | ✅ FIXED | `npm test` (particles) + lint |
 | BUG-12 | 🟡 | `index.html` precipitation card hardcoded `0 mm` + `initCharts` hardcoded fake `[5,8,12,…]` data; compass needle + humidity gauge never update | TODO | — |
 | BUG-13 | 🟡 | i18n largely non-functional: only ~1 `data-i18n` attribute in the whole app; language switcher translates almost nothing | TODO | — |
 | BUG-14 | 🟡 | PDF downloads (`risk-report`, `compare`, `trip`) assume `window.jspdf` exists → TypeError crash if CDN blocked | TODO | — |
@@ -115,7 +115,12 @@
 - **Verify:** `npm test` 51/51 (4 new `map-layers` tests with Leaflet stub: overlay URL, live temps, layer swap + legend, keyless honesty); `npm run lint` clean.
 - **Files:** `pages/map.html`, `tests/map-layers.test.js`
 
-*(next: BUG-11)*
+### BUG-11 — Valid snow fill styles ✅ FIXED (attempt 2; attempt 1 = test also captured legit CanvasGradient objects)
+- **Change:** `particles.js` gains `withAlpha()` (rebuilds `rgb()/rgba()` with clamped alpha) used by `drawSnowParticle`; string-append hack removed.
+- **Verify:** `npm test` 53/53 (2 new `particles` tests: single-frame render asserts every string fill matches valid `rgba()`, alpha varies); `npm run lint` clean.
+- **Files:** `js/particles.js`, `tests/particles.test.js`
+
+*(next: BUG-12)*
 
 ---
 

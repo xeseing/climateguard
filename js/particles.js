@@ -258,7 +258,7 @@ const ParticleSystem = (function() {
     function drawSnowParticle(particle) {
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color.replace(')', `, ${particle.opacity})`).replace('rgba', 'rgba');
+        ctx.fillStyle = withAlpha(particle.color, particle.opacity);
         ctx.fill();
         
         // Add glow effect for larger snowflakes
@@ -276,6 +276,17 @@ const ParticleSystem = (function() {
         }
     }
     
+    /**
+     * Utility: Rebuild an rgb()/rgba() color string with a new alpha channel.
+     * (String-appending alpha produces invalid 5-component rgba() that canvas ignores.)
+     */
+    function withAlpha(color, alpha) {
+        const m = /rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(color || '');
+        if (!m) return color;
+        const a = Math.max(0, Math.min(1, Number(alpha)));
+        return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${Number.isFinite(a) ? a : 1})`;
+    }
+
     /**
      * Utility: Random number between min and max
      */
