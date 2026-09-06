@@ -179,6 +179,10 @@
         // Download PDF
         document.getElementById('downloadTripBtn')?.addEventListener('click', () => {
             if (!currentTripData) return;
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                if (typeof UI !== 'undefined') UI.showNotification('PDF library failed to load. Check your connection and retry.', 'error');
+                return;
+            }
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFillColor(10,10,18); doc.rect(0,0,210,35,'F');

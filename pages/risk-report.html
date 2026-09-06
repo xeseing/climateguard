@@ -403,6 +403,10 @@
         }
 
         function downloadReport(riskReport) {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                if (typeof UI !== 'undefined') UI.showNotification('PDF library failed to load. Check your connection and retry.', 'error');
+                return;
+            }
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const reportData = RiskEngine.generateReportData(riskReport);
