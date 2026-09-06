@@ -52,16 +52,16 @@ const UI = (function() {
         const loc = data.location;
 
         setText('locationName', loc?.name || 'Your Location');
-        setText('temperature', (w.temp ?? '--') + '°');
+        setText('temperature', Units.format(w.temp));
         setText('condition', w.conditionText || '');
-        setText('tempHigh', 'H: ' + (w.tempMax ?? '--') + '°');
-        setText('tempLow', 'L: ' + (w.tempMin ?? '--') + '°');
+        setText('tempHigh', 'H: ' + Units.format(w.tempMax));
+        setText('tempLow', 'L: ' + Units.format(w.tempMin));
         setText('uvIndexValue', w.uvIndex ?? '—');
         setText('airQualityValue', w.airQuality ?? '—');
         setText('windSpeedValue', w.windSpeed ?? '—');
         setText('windDirection', w.windDirection || '—');
         setText('humidityValue', (w.humidity ?? '—') + '%');
-        setText('feelsLikeValue', (w.feelsLike ?? '—') + '°');
+        setText('feelsLikeValue', Units.format(w.feelsLike));
         setText('pressureValue', w.pressure ?? '—');
         setText('visibilityValue', (w.visibility ?? '—') + ' km');
         setText('precipValue', w.precipitation == null ? '—' : w.precipitation + ' mm');
@@ -85,7 +85,7 @@ const UI = (function() {
         if (w.temp != null && w.humidity != null && w.humidity > 0) {
             const a = 17.27, b = 237.7;
             const gamma = (a * w.temp) / (b + w.temp) + Math.log(w.humidity / 100);
-            setText('dewPointValue', Math.round((b * gamma) / (a - gamma)) + '°');
+            setText('dewPointValue', Units.format(Math.round((b * gamma) / (a - gamma))));
         }
 
         // Update date
@@ -142,7 +142,7 @@ const UI = (function() {
             const cls = i === 0 ? 'hourly-item now' : (h.isSunset ? 'hourly-item sunset' : 'hourly-item');
             const label = i === 0 ? 'Now' : h.timeFormatted;
             const icon = h.isSunrise ? 'fa-sunrise' : (h.isSunset ? 'fa-sunset' : (h.conditionIcon || 'fa-sun'));
-            return `<div class="${cls}"><span class="time">${label}</span><i class="fa-solid ${icon}"></i><span class="temp">${h.temp}°</span></div>`;
+            return `<div class="${cls}"><span class="time">${label}</span><i class="fa-solid ${icon}"></i><span class="temp">${Units.format(h.temp)}</span></div>`;
         }).join('');
     }
 
@@ -168,7 +168,7 @@ const UI = (function() {
                 `<div class="list-item__icon"><i class="fa-solid ${escapeHtml(icon)}"></i></div>` +
                 `<div class="list-item__content"><div class="list-item__title">${label}</div>` +
                 `<div class="list-item__subtitle">${escapeHtml(h.conditionText || h.condition || '')}${precip}</div></div>` +
-                `<div class="list-item__value">${escapeHtml(h.temp ?? '—')}°</div></div>`;
+                `<div class="list-item__value">${escapeHtml(Units.format(h.temp))}</div></div>`;
         }).join('');
     }
 
@@ -180,7 +180,7 @@ const UI = (function() {
                 `<div class="list-item__icon"><i class="fa-solid ${escapeHtml(icon)}"></i></div>` +
                 `<div class="list-item__content"><div class="list-item__title">${escapeHtml(d.dayName)}</div>` +
                 `<div class="list-item__subtitle">${escapeHtml(d.conditionText || d.condition || '')} • 💧 ${escapeHtml(d.precipitation ?? 0)}% • UV ${escapeHtml(d.uvIndex ?? '—')}</div></div>` +
-                `<div class="list-item__value">${escapeHtml(d.tempHigh ?? '—')}° / ${escapeHtml(d.tempLow ?? '—')}°</div></div>`;
+                `<div class="list-item__value">${escapeHtml(Units.format(d.tempHigh))} / ${escapeHtml(Units.format(d.tempLow))}</div></div>`;
         }).join('');
     }
 

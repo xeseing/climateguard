@@ -37,6 +37,7 @@ test('rejects when geolocation is unsupported', async () => {
 
 test('App.loadWeather falls back to default location with GPS denied', async () => {
   const s = geoSandbox({ getCurrentPosition: (ok, err) => err({ code: 1, message: 'denied' }) });
+  loadModule(s, 'js/units.js');
   loadModule(s, 'js/ui.js');
   loadModule(s, 'js/app.js');
   s.UI = getGlobal(s, 'UI');

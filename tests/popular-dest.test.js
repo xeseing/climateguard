@@ -33,6 +33,7 @@ async function renderPopular() {
   const sandbox = createSandbox({ fetch: fetchImpl });
   loadModule(sandbox, 'js/config.js');
   loadModule(sandbox, 'js/storage.js');
+  loadModule(sandbox, 'js/units.js');
   loadModule(sandbox, 'js/api.js');
   loadModule(sandbox, 'js/risk-engine.js');
   loadModule(sandbox, 'js/ui.js');

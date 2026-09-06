@@ -8,6 +8,8 @@ const { createSandbox, loadModule, getGlobal } = require('./helpers');
 
 function loadUI() {
   const sandbox = createSandbox();
+  loadModule(sandbox, 'js/storage.js');
+  loadModule(sandbox, 'js/units.js');
   loadModule(sandbox, 'js/ui.js');
   sandbox.UI = getGlobal(sandbox, 'UI');
   return sandbox;

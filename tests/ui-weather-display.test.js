@@ -22,6 +22,8 @@ function sampleData() {
 
 function loadUI() {
   const sandbox = createSandbox();
+  loadModule(sandbox, 'js/storage.js');
+  loadModule(sandbox, 'js/units.js');
   loadModule(sandbox, 'js/ui.js');
   sandbox.UI = getGlobal(sandbox, 'UI');
   return sandbox;
@@ -49,7 +51,7 @@ test('humidity and pressure gauge arcs track live values', () => {
 test('dew point is computed from temp + humidity (Magnus)', () => {
   const sandbox = loadUI();
   sandbox.UI.updateWeatherDisplay(sampleData());
-  assert.equal(sandbox.document.getElementById('dewPointValue').textContent, '21°');
+  assert.equal(sandbox.document.getElementById('dewPointValue').textContent, '21°C');
 });
 
 test('precip chart renders real hourly labels + values', () => {

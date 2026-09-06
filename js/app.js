@@ -226,10 +226,10 @@ const App = (function() {
                 const d = await WeatherAPI.getCurrentWeather(c.lat, c.lon);
                 const risk = (typeof RiskEngine !== 'undefined') ? RiskEngine.analyzeRisks(d) : null;
                 const level = risk ? risk.overallLevel : { label: 'Low', color: '#22c55e' };
-                const temp = d?.weather?.temp ?? '—';
+                const temp = Units.format(d?.weather?.temp);
                 return `<div class="popular-dest-card" aria-label="${c.name} weather">
                     <div class="popular-dest-card__city">${c.name}</div>
-                    <div class="popular-dest-card__temp">${temp}°</div>
+                    <div class="popular-dest-card__temp">${temp}</div>
                     <span class="popular-dest-card__badge" style="background:${level.color}20;color:${level.color}">${level.label}</span>
                 </div>`;
             } catch {
