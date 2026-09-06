@@ -32,7 +32,7 @@
             <div class="navbar__logo"><i class="fa-solid fa-shield-halved navbar__logo-icon"></i><span>ClimateGuard</span></div>
             <div class="navbar__center"><span id="currentTime">12:00 PM</span></div>
             <div class="navbar__actions">
-                <button class="icon-btn" id="settingsBtn" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
+                <button class="icon-btn" id="settingsBtn" aria-label="Settings" data-i18n-aria="settings"><i class="fa-solid fa-gear"></i></button>
             </div>
         </nav>
 
@@ -55,7 +55,7 @@
                     <span id="tempHigh">H: 32°</span><span style="margin:0 8px">|</span><span id="tempLow">L: 21°</span>
                 </div>
                 <div class="date" id="currentDate" style="color:var(--color-text-secondary);font-size:0.9rem">Monday, January 15</div>
-                <div class="mt-sm"><a href="weekly.html" style="color:var(--color-accent);font-size:0.85rem;text-decoration:none;font-weight:600">7-Day Forecast →</a></div>
+                <div class="mt-sm"><a href="weekly.html" style="color:var(--color-accent);font-size:0.85rem;text-decoration:none;font-weight:600"><span data-i18n="weeklyForecast">7-Day Forecast</span> →</a></div>
                 <div class="scroll-indicator mt-xl"><i class="fa-solid fa-chevron-down" style="color:var(--color-text-secondary)"></i></div>
             </section>
 
@@ -81,7 +81,7 @@
             <!-- Risk Summary -->
             <section class="section">
                 <a href="risk-report.html" class="card card--no-hover reveal" id="riskSummaryCard" style="text-decoration:none;display:block;cursor:pointer">
-                    <div class="card__header"><i class="fa-solid fa-triangle-exclamation"></i><span>Weather Risk Summary</span>
+                    <div class="card__header"><i class="fa-solid fa-triangle-exclamation"></i><span data-i18n="riskSummary">Weather Risk Summary</span>
                         <span style="margin-left:auto;font-size:0.75rem;color:var(--color-accent)">View Full Report →</span>
                     </div>
                     <div id="riskSummaryContent" style="display:flex;gap:12px;flex-wrap:wrap"></div>
@@ -104,7 +104,7 @@
 
             <!-- How It Works -->
             <section class="section reveal">
-                <div class="section__header"><span class="section__title">How It Works</span></div>
+                <div class="section__header"><span class="section__title" data-i18n="howItWorks">How It Works</span></div>
                 <div class="how-it-works">
                     <div class="how-step"><div class="how-step__number">1</div><div class="how-step__title">Search Any City</div><div class="how-step__desc">Search any city worldwide using our global database powered by OpenWeatherMap.</div></div>
                     <div class="how-step"><div class="how-step__number">2</div><div class="how-step__title">Analyze Risks</div><div class="how-step__desc">Our engine evaluates UV, wind, heat, storms, air quality and more in real-time.</div></div>
@@ -115,7 +115,7 @@
 
             <!-- Feature Highlights -->
             <section class="section reveal">
-                <div class="section__header"><span class="section__title">Features</span></div>
+                <div class="section__header"><span class="section__title" data-i18n="features">Features</span></div>
                 <div class="feature-strip">
                     <div class="feature-strip__item"><i class="fa-solid fa-clock-rotate-left"></i><span>Real-Time Updates</span></div>
                     <div class="feature-strip__item"><i class="fa-solid fa-city"></i><span>Multi-City Compare</span></div>
@@ -128,7 +128,7 @@
 
             <!-- Popular Destinations Risk Today -->
             <section class="section reveal">
-                <div class="section__header"><span class="section__title">Popular Destinations Risk Today</span></div>
+                <div class="section__header"><span class="section__title" data-i18n="popularDestinations">Popular Destinations Risk Today</span></div>
                 <div class="popular-destinations-grid" id="popularDestinations">
                     <div class="popular-dest-card"><div class="spinner-sm" style="margin:20px auto"></div></div>
                 </div>
@@ -136,7 +136,7 @@
 
             <!-- Trip Countdowns -->
             <section class="section reveal">
-                <div class="section__header"><span class="section__title">My Trip Countdowns</span></div>
+                <div class="section__header"><span class="section__title" data-i18n="myTripCountdowns">My Trip Countdowns</span></div>
                 <div id="tripCountdowns"><p class="empty-state">No saved trips yet</p></div>
             </section>
 
@@ -257,11 +257,11 @@
 
         <!-- Tab Bar -->
         <nav class="tab-bar" role="navigation" aria-label="Page navigation">
-            <a href="index.html" class="tab-item active" aria-label="Home"><i class="fa-solid fa-house"></i><span>Home</span></a>
-            <a href="map.html" class="tab-item" aria-label="Map"><i class="fa-solid fa-map-location-dot"></i><span>Map</span></a>
-            <a href="risk-report.html" class="tab-item" aria-label="Risk"><i class="fa-solid fa-triangle-exclamation"></i><span>Risk</span></a>
-            <a href="trip-planner.html" class="tab-item" aria-label="Trip"><i class="fa-solid fa-route"></i><span>Trip</span></a>
-            <a href="search.html" class="tab-item" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a>
+            <a href="index.html" class="tab-item active" aria-label="Home"><i class="fa-solid fa-house"></i><span data-i18n="home">Home</span></a>
+            <a href="map.html" class="tab-item" aria-label="Map"><i class="fa-solid fa-map-location-dot"></i><span data-i18n="map">Map</span></a>
+            <a href="risk-report.html" class="tab-item" aria-label="Risk"><i class="fa-solid fa-triangle-exclamation"></i><span data-i18n="risk">Risk</span></a>
+            <a href="trip-planner.html" class="tab-item" aria-label="Trip"><i class="fa-solid fa-route"></i><span data-i18n="trip">Trip</span></a>
+            <a href="search.html" class="tab-item" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i><span data-i18n="search">Search</span></a>
         </nav>
     </div>
 

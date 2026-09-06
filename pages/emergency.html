@@ -17,36 +17,36 @@
     <div class="app">
         <nav class="navbar"><div class="navbar__logo"><i class="fa-solid fa-shield-halved navbar__logo-icon"></i><span>ClimateGuard</span></div><div class="navbar__center"><span>Emergency</span></div><div class="navbar__actions"><button class="icon-btn" onclick="window.location.href='index.html'" aria-label="Home"><i class="fa-solid fa-house"></i></button></div></nav>
         <main class="main-content">
-            <div class="page-header"><h1 class="page-header__title"><i class="fa-solid fa-phone-volume" style="color:#ef4444;margin-right:8px"></i>Emergency Contacts</h1><p class="page-header__subtitle">Manage your emergency contacts & global emergency numbers</p></div>
+            <div class="page-header"><h1 class="page-header__title"><i class="fa-solid fa-phone-volume" style="color:#ef4444;margin-right:8px"></i><span data-i18n="emergencyContacts">Emergency Contacts</span></h1><p class="page-header__subtitle">Manage your emergency contacts & global emergency numbers</p></div>
 
             <!-- Add Contact -->
             <section class="section">
                 <div class="card card--no-hover" style="padding:20px">
-                    <div class="card__header"><i class="fa-solid fa-user-plus"></i><span>Add Emergency Contact</span></div>
-                    <input class="settings-input" id="contactName" placeholder="Name">
-                    <input class="settings-input" id="contactPhone" placeholder="Phone Number" type="tel">
-                    <input class="settings-input" id="contactRelation" placeholder="Relationship (e.g. Parent, Spouse)">
-                    <input class="settings-input" id="contactEmail" placeholder="Email (optional)" type="email">
-                    <button class="btn btn--primary btn--block mt-sm" id="addContactBtn"><i class="fa-solid fa-plus"></i> Add Contact</button>
+                    <div class="card__header"><i class="fa-solid fa-user-plus"></i><span data-i18n="addEmergencyContact">Add Emergency Contact</span></div>
+                    <input class="settings-input" id="contactName" placeholder="Name" data-i18n-placeholder="name">
+                    <input class="settings-input" id="contactPhone" placeholder="Phone Number" type="tel" data-i18n-placeholder="phone">
+                    <input class="settings-input" id="contactRelation" placeholder="Relationship (e.g. Parent, Spouse)" data-i18n-placeholder="relationship">
+                    <input class="settings-input" id="contactEmail" placeholder="Email (optional)" type="email" data-i18n-placeholder="email">
+                    <button class="btn btn--primary btn--block mt-sm" id="addContactBtn"><i class="fa-solid fa-plus"></i> <span data-i18n="addContact">Add Contact</span></button>
                 </div>
             </section>
 
             <!-- Contact List -->
             <section class="section">
-                <div class="section__header"><span class="section__title">My Contacts</span></div>
+                <div class="section__header"><span class="section__title" data-i18n="myContacts">My Contacts</span></div>
                 <div id="contactsList"></div>
             </section>
 
             <!-- Global Emergency Numbers -->
             <section class="section">
-                <div class="section__header"><span class="section__title">Global Emergency Numbers</span></div>
+                <div class="section__header"><span class="section__title" data-i18n="globalEmergency">Global Emergency Numbers</span></div>
                 <div class="card card--no-hover" style="padding:20px">
-                    <select class="settings-select mb-md" id="countrySelect"><option value="">— Select Country —</option></select>
+                    <select class="settings-select mb-md" id="countrySelect"><option value="" data-i18n="selectCountry">— Select Country —</option></select>
                     <div id="emergencyNumbers" style="display:none">
                         <div class="global-emergency-grid">
-                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-shield-halved"></i> Police</div><div class="global-emergency-card__number" id="policeNum">—</div></div>
-                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-truck-medical"></i> Ambulance</div><div class="global-emergency-card__number" id="ambulanceNum">—</div></div>
-                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-fire-extinguisher"></i> Fire</div><div class="global-emergency-card__number" id="fireNum">—</div></div>
+                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-shield-halved"></i> <span data-i18n="police">Police</span></div><div class="global-emergency-card__number" id="policeNum">—</div></div>
+                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-truck-medical"></i> <span data-i18n="ambulance">Ambulance</span></div><div class="global-emergency-card__number" id="ambulanceNum">—</div></div>
+                            <div class="global-emergency-card"><div class="global-emergency-card__type"><i class="fa-solid fa-fire-extinguisher"></i> <span data-i18n="fire">Fire</span></div><div class="global-emergency-card__number" id="fireNum">—</div></div>
                         </div>
                     </div>
                 </div>
@@ -55,12 +55,12 @@
             <!-- Share Location CTA -->
             <section class="section">
                 <button class="btn btn--block mt-sm emergency-btn--location" id="shareLocationBtn" style="width:100%;padding:16px;border-radius:var(--radius-lg);font-size:0.95rem">
-                    <i class="fa-solid fa-location-arrow"></i> Share My Location via SMS
+                    <i class="fa-solid fa-location-arrow"></i> <span data-i18n="shareLocation">Share My Location via SMS</span>
                 </button>
                 <p style="text-align:center;font-size:0.7rem;color:var(--color-text-tertiary);margin-top:8px">Opens your SMS app with your GPS coordinates</p>
             </section>
         </main>
-        <nav class="tab-bar"><a href="index.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Home</span></a><a href="map.html" class="tab-item"><i class="fa-solid fa-map-location-dot"></i><span>Map</span></a><a href="risk-report.html" class="tab-item"><i class="fa-solid fa-triangle-exclamation"></i><span>Risk</span></a><a href="trip-planner.html" class="tab-item"><i class="fa-solid fa-route"></i><span>Trip</span></a><a href="search.html" class="tab-item"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a></nav>
+        <nav class="tab-bar"><a href="index.html" class="tab-item"><i class="fa-solid fa-house"></i><span data-i18n="home">Home</span></a><a href="map.html" class="tab-item"><i class="fa-solid fa-map-location-dot"></i><span data-i18n="map">Map</span></a><a href="risk-report.html" class="tab-item"><i class="fa-solid fa-triangle-exclamation"></i><span data-i18n="risk">Risk</span></a><a href="trip-planner.html" class="tab-item"><i class="fa-solid fa-route"></i><span data-i18n="trip">Trip</span></a><a href="search.html" class="tab-item"><i class="fa-solid fa-magnifying-glass"></i><span data-i18n="search">Search</span></a></nav>
     </div>
     <script src="../js/config.js"></script><script src="../js/storage.js"></script><script src="../js/i18n.js"></script><script src="../js/api.js"></script><script src="../js/particles.js"></script><script src="../js/weather-engine.js"></script><script src="../js/animation-engine.js"></script><script src="../js/theme.js"></script><script src="../js/risk-engine.js"></script><script src="../js/ui.js"></script><script src="../js/app.js"></script><script src="../js/settings-handler.js"></script>
     <script>

@@ -15,7 +15,7 @@
 | Area | Result |
 |---|---|
 | JS syntax (`node --check`, 13 files) | ✅ all pass |
-| HTML pages (8 in `pages/`) | ⚠️ 2 dead/orphan (hourly, weekly); no root `index.html` |
+| HTML pages (9 in `pages/`) | ⚠️ 2 dead/orphan (hourly, weekly — fixed BUG-01); no root `index.html` |
 | CSS hooks for JS-rendered classes | ✅ mostly present; `.offline-banner`, `.api-error-card` missing |
 | Tests / lint / CI | ❌ none (added in Phase 1) |
 | Deps | CDN-only: FontAwesome, Chart.js, jsPDF, Leaflet, Google Fonts |
@@ -40,7 +40,7 @@
 | BUG-10 | 🟡 | Map layer buttons (temp/wind/precip/clouds) only swap the legend — no actual tile-layer change; all 30 city markers are hardcoded static fake data | ✅ FIXED | `npm test` (map-layers) + lint |
 | BUG-11 | 🟡 | `particles.js` snow color hack produces invalid 5-component `rgba()` → `fillStyle` assignment ignored (snow renders wrong/invisible) | ✅ FIXED | `npm test` (particles) + lint |
 | BUG-12 | 🟡 | `index.html` precipitation card hardcoded `0 mm` + `initCharts` hardcoded fake `[5,8,12,…]` data; compass needle + humidity gauge never update | ✅ FIXED | `npm test` (ui-weather-display) + lint |
-| BUG-13 | 🟡 | i18n largely non-functional: only ~1 `data-i18n` attribute in the whole app; language switcher translates almost nothing | TODO | — |
+| BUG-13 | 🟡 | i18n largely non-functional: only ~1 `data-i18n` attribute in the whole app; language switcher translates almost nothing | ✅ FIXED | `npm test` (i18n-coverage) + lint |
 | BUG-14 | 🟡 | PDF downloads (`risk-report`, `compare`, `trip`) assume `window.jspdf` exists → TypeError crash if CDN blocked | TODO | — |
 | BUG-15 | 🟡 | `renderPopularDestinations` fires 6 **sequential** API calls on every home load (slow, no error state) | TODO | — |
 | BUG-16 | 🔵 | No root `index.html` / redirect — static hosts serving repo root show nothing | TODO | — |
@@ -125,7 +125,12 @@
 - **Verify:** `npm test` 59/59 (6 new `ui-weather-display` tests); `npm run lint` clean.
 - **Files:** `js/ui.js`, `js/app.js`, `pages/index.html`, `tests/ui-weather-display.test.js`
 
-*(next: BUG-13)*
+### BUG-13 — i18n coverage ✅ FIXED (attempt 1)
+- **Change:** tagged ~90 strings across all 9 pages (`data-i18n`/`-placeholder`/`-aria`): every tab bar, page headers, section titles, form labels/options, buttons, contact placeholders; added 14 new keys × 5 languages (en/hi/es/fr/ar). Applied via assertion-checked all-or-nothing script (exact-match counts verified pre-write). Corrected audit nit: repo has 9 pages, not 8.
+- **Verify:** `npm test` 63/63 (4 new `i18n-coverage` tests: ≥70 tags, per-page tab keys, 5-language key parity, switch behavior incl. RTL); `npm run lint` clean.
+- **Files:** `js/i18n.js`, all `pages/*.html`, `tests/i18n-coverage.test.js`
+
+*(next: BUG-14)*
 
 ---
 

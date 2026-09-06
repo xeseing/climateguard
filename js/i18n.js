@@ -61,7 +61,8 @@ const I18n = (function () {
             exportComparison: 'Export Comparison PDF',
             previewThemes: 'Preview Weather Themes',
             clearDay: 'Clear Day', night: 'Night', cloudy: 'Cloudy',
-            rain: 'Rain', storm: 'Storm', snow: 'Snow'
+            rain: 'Rain', storm: 'Storm', snow: 'Snow',
+            weeklyForecast: '7-Day Forecast', weatherMap: 'Weather Map', myTripCountdowns: 'My Trip Countdowns', riskSummary: 'Weather Risk Summary', useCurrentLocation: 'Use Current Location', recentSearches: 'Recent Searches', popularCities: 'Popular Cities', myContacts: 'My Contacts', comparisonResults: 'Comparison Results', dayByDayForecast: 'Day-by-Day Forecast', tripDetails: 'Trip Details', overallRiskLevel: 'Overall Risk Level', quickDestinations: 'Quick Destinations', addEmergencyContact: 'Add Emergency Contact'
         },
         hi: {
             home: 'होम', map: 'मैप', risk: 'जोखिम', trip: 'यात्रा', search: 'खोजें',
@@ -111,7 +112,8 @@ const I18n = (function () {
             exportComparison: 'तुलना पीडीएफ निर्यात करें',
             previewThemes: 'मौसम थीम पूर्वावलोकन',
             clearDay: 'साफ दिन', night: 'रात', cloudy: 'बादल',
-            rain: 'बारिश', storm: 'तूफान', snow: 'बर्फ'
+            rain: 'बारिश', storm: 'तूफान', snow: 'बर्फ',
+            weeklyForecast: 'साप्ताहिक पूर्वानुमान', weatherMap: 'मौसम मानचित्र', myTripCountdowns: 'मेरी यात्रा उलटी गिनती', riskSummary: 'जोखिम सारांश', useCurrentLocation: 'वर्तमान स्थान का उपयोग करें', recentSearches: 'हाल की खोजें', popularCities: 'लोकप्रिय शहर', myContacts: 'मेरे संपर्क', comparisonResults: 'तुलना परिणाम', dayByDayForecast: 'दिन-प्रतिदिन पूर्वानुमान', tripDetails: 'यात्रा विवरण', overallRiskLevel: 'समग्र जोखिम स्तर', quickDestinations: 'त्वरित गंतव्य', addEmergencyContact: 'आपातकालीन संपर्क जोड़ें'
         },
         es: {
             home: 'Inicio', map: 'Mapa', risk: 'Riesgo', trip: 'Viaje', search: 'Buscar',
@@ -161,7 +163,8 @@ const I18n = (function () {
             exportComparison: 'Exportar Comparación PDF',
             previewThemes: 'Vista previa de temas',
             clearDay: 'Día Despejado', night: 'Noche', cloudy: 'Nublado',
-            rain: 'Lluvia', storm: 'Tormenta', snow: 'Nieve'
+            rain: 'Lluvia', storm: 'Tormenta', snow: 'Nieve',
+            weeklyForecast: 'Pronóstico Semanal', weatherMap: 'Mapa del Clima', myTripCountdowns: 'Mis Cuentas Regresivas', riskSummary: 'Resumen de Riesgos', useCurrentLocation: 'Usar Ubicación Actual', recentSearches: 'Búsquedas Recientes', popularCities: 'Ciudades Populares', myContacts: 'Mis Contactos', comparisonResults: 'Resultados', dayByDayForecast: 'Pronóstico Día a Día', tripDetails: 'Detalles del Viaje', overallRiskLevel: 'Nivel de Riesgo General', quickDestinations: 'Destinos Rápidos', addEmergencyContact: 'Agregar Contacto de Emergencia'
         },
         fr: {
             home: 'Accueil', map: 'Carte', risk: 'Risque', trip: 'Voyage', search: 'Rechercher',
@@ -211,7 +214,8 @@ const I18n = (function () {
             exportComparison: 'Exporter la Comparaison PDF',
             previewThemes: 'Aperçu des thèmes',
             clearDay: 'Jour Clair', night: 'Nuit', cloudy: 'Nuageux',
-            rain: 'Pluie', storm: 'Orage', snow: 'Neige'
+            rain: 'Pluie', storm: 'Orage', snow: 'Neige',
+            weeklyForecast: 'Prévisions Hebdomadaires', weatherMap: 'Carte Météo', myTripCountdowns: 'Mes Comptes à Rebours', riskSummary: 'Résumé des Risques', useCurrentLocation: 'Utiliser ma Position', recentSearches: 'Recherches Récentes', popularCities: 'Villes Populaires', myContacts: 'Mes Contacts', comparisonResults: 'Résultats', dayByDayForecast: 'Prévisions Jour par Jour', tripDetails: 'Détails du Voyage', overallRiskLevel: 'Niveau de Risque Global', quickDestinations: 'Destinations Rapides', addEmergencyContact: 'Ajouter un Contact d\'Urgence'
         },
         ar: {
             home: 'الرئيسية', map: 'الخريطة', risk: 'المخاطر', trip: 'الرحلة', search: 'بحث',
@@ -261,7 +265,8 @@ const I18n = (function () {
             exportComparison: 'تصدير مقارنة PDF',
             previewThemes: 'معاينة الثيمات',
             clearDay: 'يوم صافٍ', night: 'ليل', cloudy: 'غائم',
-            rain: 'مطر', storm: 'عاصفة', snow: 'ثلج'
+            rain: 'مطر', storm: 'عاصفة', snow: 'ثلج',
+            weeklyForecast: 'التوقعات الأسبوعية', weatherMap: 'خريطة الطقس', myTripCountdowns: 'العد التنازلي لرحلاتي', riskSummary: 'ملخص المخاطر', useCurrentLocation: 'استخدام موقعي الحالي', recentSearches: 'عمليات البحث الأخيرة', popularCities: 'مدن شهيرة', myContacts: 'جهات الاتصال الخاصة بي', comparisonResults: 'نتائج المقارنة', dayByDayForecast: 'توقعات يوما بيوم', tripDetails: 'تفاصيل الرحلة', overallRiskLevel: 'مستوى الخطر العام', quickDestinations: 'وجهات سريعة', addEmergencyContact: 'إضافة جهة اتصال للطوارئ'
         }
     };
 

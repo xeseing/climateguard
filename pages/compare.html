@@ -15,9 +15,9 @@
 <body data-weather="clear_day">
     <div class="weather-background"><div class="weather-background__sky"></div><div class="weather-background__clouds"></div><div class="weather-background__particles"><canvas id="particleCanvas"></canvas></div><div class="weather-background__effects"></div><div class="weather-background__overlay"></div></div>
     <div class="app">
-        <nav class="navbar"><div class="navbar__logo"><i class="fa-solid fa-shield-halved navbar__logo-icon"></i><span>ClimateGuard</span></div><div class="navbar__center"><span>Multi-City Compare</span></div><div class="navbar__actions"><button class="icon-btn" onclick="window.location.href='index.html'" aria-label="Home"><i class="fa-solid fa-house"></i></button></div></nav>
+        <nav class="navbar"><div class="navbar__logo"><i class="fa-solid fa-shield-halved navbar__logo-icon"></i><span>ClimateGuard</span></div><div class="navbar__center"><span data-i18n="multiCity">Multi-City Compare</span></div><div class="navbar__actions"><button class="icon-btn" onclick="window.location.href='index.html'" aria-label="Home"><i class="fa-solid fa-house"></i></button></div></nav>
         <main class="main-content">
-            <div class="page-header"><h1 class="page-header__title"><i class="fa-solid fa-chart-column" style="color:var(--color-accent);margin-right:8px"></i>Multi-City Comparison</h1><p class="page-header__subtitle">Compare weather risks across up to 5 cities</p></div>
+            <div class="page-header"><h1 class="page-header__title"><i class="fa-solid fa-chart-column" style="color:var(--color-accent);margin-right:8px"></i><span data-i18n="multiCity">Multi-City Comparison</span></h1><p class="page-header__subtitle">Compare weather risks across up to 5 cities</p></div>
 
             <section class="section">
                 <div class="card card--no-hover" style="padding:20px">
@@ -25,18 +25,18 @@
                         <div class="compare-input-row"><input class="input compare-city-input" placeholder="Enter city name..." style="padding-left:16px"><button class="icon-btn" onclick="addCityInput()" aria-label="Add city"><i class="fa-solid fa-plus"></i></button></div>
                         <div class="compare-input-row"><input class="input compare-city-input" placeholder="Enter city name..." style="padding-left:16px"></div>
                     </div>
-                    <button class="btn btn--primary btn--block mt-md" id="compareBtn"><i class="fa-solid fa-magnifying-glass-chart"></i> Compare Cities</button>
+                    <button class="btn btn--primary btn--block mt-md" id="compareBtn"><i class="fa-solid fa-magnifying-glass-chart"></i> <span data-i18n="compareCities">Compare Cities</span></button>
                 </div>
             </section>
 
             <section class="section" id="comparisonResults" style="display:none">
-                <div class="section__header"><span class="section__title">Comparison Results</span></div>
+                <div class="section__header"><span class="section__title" data-i18n="comparisonResults">Comparison Results</span></div>
                 <div class="compare-table-wrap"><table class="compare-table" id="compareTable"></table></div>
                 <div id="radarChartWrap" style="max-width:400px;margin:24px auto"><canvas id="radarChart"></canvas></div>
-                <button class="download-btn mt-lg" id="exportCompareBtn"><i class="fa-solid fa-file-pdf"></i> Export Comparison PDF</button>
+                <button class="download-btn mt-lg" id="exportCompareBtn"><i class="fa-solid fa-file-pdf"></i> <span data-i18n="exportComparison">Export Comparison PDF</span></button>
             </section>
         </main>
-        <nav class="tab-bar"><a href="index.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Home</span></a><a href="map.html" class="tab-item"><i class="fa-solid fa-map-location-dot"></i><span>Map</span></a><a href="risk-report.html" class="tab-item"><i class="fa-solid fa-triangle-exclamation"></i><span>Risk</span></a><a href="trip-planner.html" class="tab-item"><i class="fa-solid fa-route"></i><span>Trip</span></a><a href="search.html" class="tab-item"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a></nav>
+        <nav class="tab-bar"><a href="index.html" class="tab-item"><i class="fa-solid fa-house"></i><span data-i18n="home">Home</span></a><a href="map.html" class="tab-item"><i class="fa-solid fa-map-location-dot"></i><span data-i18n="map">Map</span></a><a href="risk-report.html" class="tab-item"><i class="fa-solid fa-triangle-exclamation"></i><span data-i18n="risk">Risk</span></a><a href="trip-planner.html" class="tab-item"><i class="fa-solid fa-route"></i><span data-i18n="trip">Trip</span></a><a href="search.html" class="tab-item"><i class="fa-solid fa-magnifying-glass"></i><span data-i18n="search">Search</span></a></nav>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

@@ -54,8 +54,7 @@
             <!-- Page Header -->
             <div class="page-header">
                 <h1 class="page-header__title">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-accent); margin-right: 8px;"></i>
-                    Weather Risk Report
+                    <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-accent); margin-right: 8px;"></i> <span data-i18n="weatherRiskReport">Weather Risk Report</span>
                 </h1>
                 <p class="page-header__subtitle" id="reportLocation">San Francisco • Generated now</p>
             </div>
@@ -65,7 +64,7 @@
                 <div class="card card--no-hover" style="padding: 24px; text-align: center;">
                     <div class="card__header" style="justify-content: center;">
                         <i class="fa-solid fa-gauge-high"></i>
-                        <span>Overall Risk Level</span>
+                        <span data-i18n="overallRiskLevel">Overall Risk Level</span>
                     </div>
                     <div class="risk-gauge">
                         <svg class="risk-gauge__svg" viewBox="0 0 200 120">
@@ -89,7 +88,7 @@
             <!-- Risk Categories -->
             <section class="section">
                 <div class="section__header">
-                    <span class="section__title">Risk Breakdown</span>
+                    <span class="section__title" data-i18n="riskBreakdown">Risk Breakdown</span>
                 </div>
                 <div id="riskCategoriesContainer">
                     <!-- Rendered by JS -->
@@ -99,7 +98,7 @@
             <!-- Recommendations -->
             <section class="section">
                 <div class="section__header">
-                    <span class="section__title">Recommendations</span>
+                    <span class="section__title" data-i18n="recommendations">Recommendations</span>
                 </div>
                 <div id="recommendationsContainer">
                     <!-- Rendered by JS -->
@@ -109,7 +108,7 @@
             <!-- Travel Advisory -->
             <section class="section">
                 <div class="section__header">
-                    <span class="section__title">Travel Advisory</span>
+                    <span class="section__title" data-i18n="travelAdvisory">Travel Advisory</span>
                 </div>
                 <div id="travelAdvisoryContainer">
                     <!-- Rendered by JS -->
@@ -186,23 +185,23 @@
         <nav class="tab-bar">
             <a href="index.html" class="tab-item">
                 <i class="fa-solid fa-house"></i>
-                <span>Home</span>
+                <span data-i18n="home">Home</span>
             </a>
             <a href="map.html" class="tab-item">
                 <i class="fa-solid fa-map-location-dot"></i>
-                <span>Map</span>
+                <span data-i18n="map">Map</span>
             </a>
             <a href="risk-report.html" class="tab-item active">
                 <i class="fa-solid fa-triangle-exclamation"></i>
-                <span>Risk</span>
+                <span data-i18n="risk">Risk</span>
             </a>
             <a href="trip-planner.html" class="tab-item">
                 <i class="fa-solid fa-route"></i>
-                <span>Trip</span>
+                <span data-i18n="trip">Trip</span>
             </a>
             <a href="search.html" class="tab-item">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <span>Search</span>
+                <span data-i18n="search">Search</span>
             </a>
         </nav>
     </div>
