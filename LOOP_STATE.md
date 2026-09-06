@@ -37,7 +37,7 @@
 | BUG-07 | 🟡 | `getCurrentLocation()` swallows denial errors, resolves SF fallback → "Use Current Location" silently teleports user to San Francisco | ✅ FIXED | `npm test` (geolocation) + lint |
 | BUG-08 | 🟡 | `searchLocations()` returns `[]` with no API key instead of local-DB fallback → search dead offline/keyless | ✅ FIXED | `npm test` (search-fallback) + lint |
 | BUG-09 | 🟡 | Risk report race: page waits fixed 800 ms then reads possibly-stale/missing `LAST_WEATHER` cache, silently falls back to SF mock | ✅ FIXED | `npm test` (risk-report) + lint |
-| BUG-10 | 🟡 | Map layer buttons (temp/wind/precip/clouds) only swap the legend — no actual tile-layer change; all 30 city markers are hardcoded static fake data | TODO | — |
+| BUG-10 | 🟡 | Map layer buttons (temp/wind/precip/clouds) only swap the legend — no actual tile-layer change; all 30 city markers are hardcoded static fake data | ✅ FIXED | `npm test` (map-layers) + lint |
 | BUG-11 | 🟡 | `particles.js` snow color hack produces invalid 5-component `rgba()` → `fillStyle` assignment ignored (snow renders wrong/invisible) | TODO | — |
 | BUG-12 | 🟡 | `index.html` precipitation card hardcoded `0 mm` + `initCharts` hardcoded fake `[5,8,12,…]` data; compass needle + humidity gauge never update | TODO | — |
 | BUG-13 | 🟡 | i18n largely non-functional: only ~1 `data-i18n` attribute in the whole app; language switcher translates almost nothing | TODO | — |
@@ -110,7 +110,12 @@
 - **Verify:** `npm test` 47/47 (3 new `risk-report` tests: fresh-beats-stale, labelled cache fallback, demo label); `npm run lint` clean.
 - **Files:** `pages/risk-report.html`, `tests/risk-report.test.js`
 
-*(next: BUG-10)*
+### BUG-10 — Live map layers + markers ✅ FIXED (attempt 1)
+- **Change:** `map.html` now loads `storage`/`api`/`risk-engine`; layer buttons swap real OWM tile overlays (`temp/wind/precipitation/clouds_new`); `CITIES` slimmed to name+coords with live `getCurrentWeather` per city (pool of 6, cached) and `RiskEngine` risk; keyless installs fetch nothing, show `—` markers + demo badge, and disable layer buttons. Risk zones use live data. (Closes Phase 3 roadmap item 2.)
+- **Verify:** `npm test` 51/51 (4 new `map-layers` tests with Leaflet stub: overlay URL, live temps, layer swap + legend, keyless honesty); `npm run lint` clean.
+- **Files:** `pages/map.html`, `tests/map-layers.test.js`
+
+*(next: BUG-11)*
 
 ---
 

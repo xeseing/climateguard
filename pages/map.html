@@ -67,6 +67,13 @@
         .tab-item { display:flex; flex-direction:column; align-items:center; gap:3px; color:rgba(255,255,255,0.5); font-size:0.6rem; font-weight:600; text-decoration:none; padding:4px 12px; }
         .tab-item i { font-size:1.15rem; }
         .tab-item.active { color:#2bd4a7; }
+
+        #mapDemoBadge {
+            position: fixed; top: 76px; left: 14px; z-index: 1000;
+            background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.4);
+            color: #fbbf24; padding: 6px 12px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +84,8 @@
     </nav>
 
     <div class="map-wrap"><div id="map"></div></div>
+
+    <div id="mapDemoBadge">⚠ Demo mode — live layers need an API key</div>
 
     <div class="map-controls">
         <button class="map-btn" id="locateBtn" title="My Location"><i class="fa-solid fa-location-crosshairs"></i></button>
@@ -118,47 +127,63 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../js/config.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/risk-engine.js"></script>
     <script>
     (function(){
+        // City facts only (name + coords) — weather is fetched live, never hardcoded
         const CITIES = [
-            {name:'Mumbai',lat:19.076,lon:72.877,temp:33,wind:14,hum:75,cond:'Humid',risk:'Moderate'},
-            {name:'New Delhi',lat:28.613,lon:77.209,temp:38,wind:12,hum:40,cond:'Sunny',risk:'High'},
-            {name:'Bengaluru',lat:12.971,lon:77.594,temp:28,wind:10,hum:60,cond:'Partly Cloudy',risk:'Low'},
-            {name:'Chennai',lat:13.082,lon:80.270,temp:35,wind:16,hum:72,cond:'Humid',risk:'Moderate'},
-            {name:'Kolkata',lat:22.572,lon:88.363,temp:34,wind:18,hum:78,cond:'Humid',risk:'Moderate'},
-            {name:'Hyderabad',lat:17.385,lon:78.486,temp:36,wind:11,hum:45,cond:'Sunny',risk:'Moderate'},
-            {name:'Pune',lat:18.520,lon:73.856,temp:32,wind:10,hum:55,cond:'Partly Cloudy',risk:'Low'},
-            {name:'Ahmedabad',lat:23.022,lon:72.571,temp:37,wind:14,hum:35,cond:'Sunny',risk:'High'},
-            {name:'Jaipur',lat:26.912,lon:75.787,temp:39,wind:15,hum:28,cond:'Sunny',risk:'High'},
-            {name:'Lucknow',lat:26.846,lon:80.946,temp:36,wind:10,hum:50,cond:'Partly Cloudy',risk:'Moderate'},
-            {name:'Kochi',lat:9.931,lon:76.267,temp:30,wind:12,hum:80,cond:'Humid',risk:'Moderate'},
-            {name:'Goa',lat:15.490,lon:73.827,temp:32,wind:18,hum:70,cond:'Partly Cloudy',risk:'Low'},
-            {name:'Shimla',lat:31.104,lon:77.173,temp:18,wind:20,hum:55,cond:'Cloudy',risk:'Low'},
-            {name:'Varanasi',lat:25.317,lon:83.006,temp:37,wind:8,hum:52,cond:'Sunny',risk:'High'},
-            {name:'Srinagar',lat:34.083,lon:74.797,temp:20,wind:12,hum:60,cond:'Cloudy',risk:'Low'},
-            {name:'San Francisco',lat:37.774,lon:-122.419,temp:28,wind:18,hum:65,cond:'Partly Cloudy',risk:'Low'},
-            {name:'New York',lat:40.712,lon:-74.006,temp:25,wind:28,hum:70,cond:'Partly Cloudy',risk:'Moderate'},
-            {name:'Los Angeles',lat:34.052,lon:-118.243,temp:33,wind:12,hum:45,cond:'Sunny',risk:'Moderate'},
-            {name:'London',lat:51.507,lon:-0.127,temp:15,wind:22,hum:78,cond:'Rainy',risk:'Moderate'},
-            {name:'Tokyo',lat:35.676,lon:139.650,temp:22,wind:15,hum:62,cond:'Partly Cloudy',risk:'Low'},
-            {name:'Dubai',lat:25.204,lon:55.270,temp:38,wind:15,hum:20,cond:'Clear',risk:'High'},
-            {name:'Singapore',lat:1.352,lon:103.819,temp:31,wind:10,hum:82,cond:'Humid',risk:'Moderate'},
-            {name:'Sydney',lat:-33.868,lon:151.209,temp:19,wind:20,hum:65,cond:'Partly Cloudy',risk:'Low'},
-            {name:'Paris',lat:48.856,lon:2.352,temp:18,wind:14,hum:68,cond:'Cloudy',risk:'Low'},
-            {name:'Bangkok',lat:13.756,lon:100.501,temp:34,wind:8,hum:80,cond:'Humid',risk:'Moderate'},
-            {name:'Cairo',lat:30.044,lon:31.235,temp:35,wind:18,hum:25,cond:'Sunny',risk:'High'},
-            {name:'Seoul',lat:37.566,lon:126.978,temp:16,wind:20,hum:55,cond:'Cloudy',risk:'Low'},
-            {name:'Istanbul',lat:41.008,lon:28.978,temp:20,wind:22,hum:60,cond:'Partly Cloudy',risk:'Moderate'},
-            {name:'São Paulo',lat:-23.550,lon:-46.633,temp:24,wind:12,hum:70,cond:'Cloudy',risk:'Low'},
-            {name:'Cape Town',lat:-33.924,lon:18.424,temp:18,wind:25,hum:68,cond:'Windy',risk:'Moderate'},
+            {name:'Mumbai',lat:19.076,lon:72.877},
+            {name:'New Delhi',lat:28.613,lon:77.209},
+            {name:'Bengaluru',lat:12.971,lon:77.594},
+            {name:'Chennai',lat:13.082,lon:80.270},
+            {name:'Kolkata',lat:22.572,lon:88.363},
+            {name:'Hyderabad',lat:17.385,lon:78.486},
+            {name:'Pune',lat:18.520,lon:73.856},
+            {name:'Ahmedabad',lat:23.022,lon:72.571},
+            {name:'Jaipur',lat:26.912,lon:75.787},
+            {name:'Lucknow',lat:26.846,lon:80.946},
+            {name:'Kochi',lat:9.931,lon:76.267},
+            {name:'Goa',lat:15.490,lon:73.827},
+            {name:'Shimla',lat:31.104,lon:77.173},
+            {name:'Varanasi',lat:25.317,lon:83.006},
+            {name:'Srinagar',lat:34.083,lon:74.797},
+            {name:'San Francisco',lat:37.774,lon:-122.419},
+            {name:'New York',lat:40.712,lon:-74.006},
+            {name:'Los Angeles',lat:34.052,lon:-118.243},
+            {name:'London',lat:51.507,lon:-0.127},
+            {name:'Tokyo',lat:35.676,lon:139.650},
+            {name:'Dubai',lat:25.204,lon:55.270},
+            {name:'Singapore',lat:1.352,lon:103.819},
+            {name:'Sydney',lat:-33.868,lon:151.209},
+            {name:'Paris',lat:48.856,lon:2.352},
+            {name:'Bangkok',lat:13.756,lon:100.501},
+            {name:'Cairo',lat:30.044,lon:31.235},
+            {name:'Seoul',lat:37.566,lon:126.978},
+            {name:'Istanbul',lat:41.008,lon:28.978},
+            {name:'São Paulo',lat:-23.550,lon:-46.633},
+            {name:'Cape Town',lat:-33.924,lon:18.424},
         ];
 
-        function riskColor(r){return{Low:'#22c55e',Moderate:'#eab308',High:'#f97316',Extreme:'#ef4444'}[r]||'#22c55e';}
+        function riskColor(r){return{Low:'#22c55e',Moderate:'#eab308',High:'#f97316',Extreme:'#ef4444',Unknown:'#64748b'}[r]||'#64748b';}
+
+        // Same resolution chain as WeatherAPI (private getApiKey is not reachable here)
+        function resolveKey(){
+            try { var o=localStorage.getItem('climateguard_api_key'); if(o) return o; } catch(e){}
+            if(typeof window!=='undefined'&&window.CLIMATEGUARD_API_KEY) return window.CLIMATEGUARD_API_KEY;
+            if(typeof CONFIG!=='undefined'&&CONFIG.API_KEY) return CONFIG.API_KEY;
+            return '';
+        }
+        var API_KEY=resolveKey();
+
+        function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
         function makeIcon(c){
             var col=riskColor(c.risk);
+            var temp=c.temp==null?'—':c.temp+'°';
             return L.divIcon({className:'weather-marker',
-                html:'<div style="background:rgba(10,10,18,0.92);border:2px solid '+col+';border-radius:12px;padding:5px 9px;color:#fff;font-family:Plus Jakarta Sans,sans-serif;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,0.5);text-align:center;line-height:1.2;">'+c.temp+'°<div style="font-size:8px;font-weight:500;opacity:0.65;">'+c.name+'</div></div>',
+                html:'<div style="background:rgba(10,10,18,0.92);border:2px solid '+col+';border-radius:12px;padding:5px 9px;color:#fff;font-family:Plus Jakarta Sans,sans-serif;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,0.5);text-align:center;line-height:1.2;">'+temp+'<div style="font-size:8px;font-weight:500;opacity:0.65;">'+esc(c.name)+'</div></div>',
                 iconSize:[85,42],iconAnchor:[42,21]});
         }
 
@@ -170,22 +195,55 @@
             attribution:'&copy; OpenStreetMap',subdomains:'abcd',maxZoom:18
         }).addTo(map);
 
+        // Live OWM weather overlay (temperature by default); keyless installs stay on base map
+        var LAYER_TILES={temp:'temp_new',wind:'wind_new',precip:'precipitation_new',clouds:'clouds_new'};
+        function overlayUrl(key){return 'https://tile.openweathermap.org/map/'+LAYER_TILES[key]+'/{z}/{x}/{y}.png?appid='+API_KEY;}
+        var overlay=null;
+        if(API_KEY){
+            overlay=L.tileLayer(overlayUrl('temp'),{maxZoom:18,opacity:0.6,attribution:'&copy; OpenWeatherMap'}).addTo(map);
+        }
+
+        // Demo badge: visible unless a key enables live data
+        var badge=document.getElementById('mapDemoBadge');
+        if(badge) badge.style.display=API_KEY?'none':'block';
+
         // Force map to resize properly
         setTimeout(function(){map.invalidateSize();},300);
         setTimeout(function(){map.invalidateSize();},1000);
 
-        // Add markers
-        CITIES.forEach(function(c){
+        // Live marker data (bounded parallelism); keyless → placeholders, no fake numbers
+        var liveCities=[];
+        function demoCity(c){return{name:c.name,lat:c.lat,lon:c.lon,temp:null,wind:null,hum:null,cond:'',risk:'Unknown'};}
+        async function fetchLive(c){
+            try{
+                var w=await WeatherAPI.getCurrentWeather(c.lat,c.lon);
+                var m=(w&&w.weather)||{};
+                var risk='Unknown';
+                if(m.temp!=null&&typeof RiskEngine!=='undefined'){risk=RiskEngine.analyzeRisks(w).overallLevel.label;}
+                return{name:c.name,lat:c.lat,lon:c.lon,temp:m.temp!=null?m.temp:null,wind:m.windSpeed!=null?m.windSpeed:null,hum:m.humidity!=null?m.humidity:null,cond:m.conditionText||'',risk:risk};
+            }catch(e){return demoCity(c);}
+        }
+        async function pool(items,n,fn){
+            var out=new Array(items.length),i=0;
+            async function worker(){while(i<items.length){var idx=i++;out[idx]=await fn(items[idx]);}}
+            var workers=[];for(var k=0;k<Math.min(n,items.length);k++)workers.push(worker());
+            await Promise.all(workers);return out;
+        }
+        function addMarker(c){
             var m=L.marker([c.lat,c.lon],{icon:makeIcon(c)}).addTo(map);
             m.on('click',function(){showInfo(c);});
-        });
+        }
+        (async function boot(){
+            liveCities=API_KEY?await pool(CITIES,6,fetchLive):CITIES.map(demoCity);
+            liveCities.forEach(addMarker);
+        })();
 
         // Info panel
         function showInfo(c){
             document.getElementById('infoName').textContent=c.name;
-            document.getElementById('infoTemp').textContent=c.temp+'°';
-            document.getElementById('infoWind').textContent=c.wind+' km/h';
-            document.getElementById('infoHum').textContent=c.hum+'%';
+            document.getElementById('infoTemp').textContent=c.temp==null?'--':c.temp+'°';
+            document.getElementById('infoWind').textContent=c.wind==null?'--':c.wind+' km/h';
+            document.getElementById('infoHum').textContent=c.hum==null?'--':c.hum+'%';
             var re=document.getElementById('infoRisk');
             re.textContent=c.risk; re.style.color=riskColor(c.risk);
             document.getElementById('mapInfo').classList.add('show');
@@ -214,12 +272,15 @@
         };
 
         document.querySelectorAll('.map-btn[data-layer]').forEach(function(btn){
+            if(!API_KEY){btn.disabled=true;btn.title='Requires API key';btn.style.opacity='0.4';}
             btn.addEventListener('click',function(){
+                if(!overlay)return;
                 // Toggle active
                 document.querySelectorAll('.map-btn[data-layer]').forEach(function(b){b.classList.remove('active');});
                 btn.classList.add('active');
                 var key=btn.dataset.layer;
-                // Update legend
+                // Swap the live tile overlay, then update legend
+                overlay.setUrl(overlayUrl(key));
                 var cfg=legends[key];
                 if(cfg){
                     document.getElementById('legendTitle').textContent=cfg.title;
@@ -239,8 +300,8 @@
                 riskOn=false;
                 this.classList.remove('active');
             }else{
-                CITIES.forEach(function(c){
-                    if(c.risk!=='Low'){
+                liveCities.forEach(function(c){
+                    if(c.risk!=='Low'&&c.risk!=='Unknown'){
                         var circle=L.circle([c.lat,c.lon],{
                             radius:c.risk==='High'?120000:80000,
                             color:riskColor(c.risk),fillColor:riskColor(c.risk),
