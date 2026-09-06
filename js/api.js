@@ -117,9 +117,15 @@ const WeatherAPI = (function () {
         };
         return m[c] || c;
     }
-    function mapCond(apiCond, isDay) {
+    function mapCond(apiCond, isDay, cloudCover) {
+        if (apiCond === 'Clouds') {
+            if (typeof cloudCover !== 'number') return 'cloudy'; // unknown cover: prior behavior
+            if (cloudCover <= 20) return isDay ? 'clear_day' : 'clear_night'; // scattered
+            if (cloudCover <= 60) return 'partly_cloudy'; // broken clouds
+            return 'cloudy'; // overcast
+        }
         const m = {
-            'Clear': isDay ? 'clear_day' : 'clear_night', 'Clouds': 'cloudy',
+            'Clear': isDay ? 'clear_day' : 'clear_night',
             'Rain': 'rain', 'Drizzle': 'rain', 'Thunderstorm': 'storm',
             'Snow': 'snow', 'Mist': 'fog', 'Fog': 'fog', 'Haze': 'fog', 'Smoke': 'fog'
         };
@@ -225,7 +231,7 @@ const WeatherAPI = (function () {
             const result = {
                 location: { id: w.id, name: w.name, country: w.sys?.country, lat: w.coord?.lat, lon: w.coord?.lon },
                 weather: {
-                    condition: mapCond(w.weather[0].main, isDay),
+                    condition: mapCond(w.weather[0].main, isDay, w.clouds?.all),
                     conditionText: w.weather[0].description.replace(/^\w/, c => c.toUpperCase()),
                     temp: Math.round(w.main.temp), feelsLike: Math.round(w.main.feels_like),
                     tempMin: Math.round(w.main.temp_min), tempMax: Math.round(w.main.temp_max),
@@ -263,7 +269,7 @@ const WeatherAPI = (function () {
             const hours = data.list.map(item => {
                 const dt = new Date(item.dt * 1000);
                 const isDay = item.sys?.pod === 'd';
-                const cond = mapCond(item.weather[0].main, isDay);
+                const cond = mapCond(item.weather[0].main, isDay, item.clouds?.all);
                 return {
                     time: dt.toISOString(),
                     timeFormatted: dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
@@ -301,7 +307,7 @@ const WeatherAPI = (function () {
             const pops = items.map(i => Math.round((i.pop || 0) * 100));
             const votes = {};
             for (const i of items) {
-                const c = mapCond(i.weather?.[0]?.main || 'Clear', true);
+                const c = mapCond(i.weather?.[0]?.main || 'Clear', true, i.clouds?.all);
                 votes[c] = (votes[c] || 0) + 1;
             }
             const condition = Object.keys(votes).sort((a, b) => votes[b] - votes[a])[0] || 'clear_day';

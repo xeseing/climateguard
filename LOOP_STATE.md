@@ -47,7 +47,7 @@
 | BUG-17 | 🔵 | Theme applied twice (`Theme.init` + `settings-handler` direct DOM manipulation, bypassing `Theme.applyTheme`) | ✅ FIXED | `npm test` (theme-single-source) + lint |
 | BUG-18 | 🔵 | `Storage.getSettings()` returns live `DEFAULT_SETTINGS` reference when empty (mutation risk); `units` setting dead (no UI/conversion → Phase 3 item 3) | ✅ FIXED | `npm test` (storage-settings) + lint |
 | BUG-19 | 🔵 | Missing CSS: `.offline-banner`, `.api-error-card` (JS injects them unstyled); `Notification.icon: '🌤️'` invalid | ✅ FIXED | `npm test` (offline-ui) + lint |
-| BUG-20 | 🔵 | ~~`lat=undefined` URL guard~~ (done in BUG-02); `mapCond('Clouds')` never yields `partly_cloudy` | TODO | — |
+| BUG-20 | 🔵 | ~~`lat=undefined` URL guard~~ (done in BUG-02); `mapCond('Clouds')` never yields `partly_cloudy` | ✅ FIXED | `npm test` (mapcond) + lint |
 
 **Architectural notes (feed Phase 3):** no PWA manifest/service worker despite offline claims; per-page script-tag soup (13 tags, order-sensitive globals); mock data silently substituted for live data in several paths — should be badged "demo data" when used.
 
@@ -160,7 +160,12 @@
 - **Verify:** `npm test` 79/79 (3 new `offline-ui` tests: 2 CSS-rule assertions + full index boot asserting the fired Notification has no `icon` key); `npm run lint` clean.
 - **Files:** `css/components.css`, `js/app.js`, `tests/offline-ui.test.js`
 
-*(next: BUG-20)*
+### BUG-20 — Cloud-cover-aware conditions ✅ FIXED (attempt 1)
+- **Change:** `mapCond(main, isDay, cloudCover)` splits `Clouds` by cover (≤20% → clear day/night, ≤60% → partly_cloudy, else cloudy; unknown cover keeps prior `cloudy`); all three call sites (current, hourly, weekly aggregation) pass `clouds.all`.
+- **Verify:** `npm test` 83/83 (4 new `mapcond` tests: day split, night, hourly, weekly votes); `npm run lint` clean.
+- **Files:** `js/api.js`, `tests/mapcond.test.js`
+
+## PHASE 2 — COMPLETE (20/20, 83 tests green, lint clean)
 
 ---
 
