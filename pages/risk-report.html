@@ -172,6 +172,16 @@
             </div>
             <div class="settings-item">
                 <div>
+                    <div class="settings-item__label" data-i18n="temperature">Temperature</div>
+                    <div class="settings-item__desc" data-i18n="useCelsius">Use Celsius</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" class="toggle__input" id="unitsToggle" checked>
+                    <span class="toggle__slider"></span>
+                </label>
+            </div>
+            <div class="settings-item">
+                <div>
                     <div class="settings-item__label">Auto Weather Theme</div>
                     <div class="settings-item__desc">Theme follows weather conditions</div>
                 </div>
@@ -318,6 +328,7 @@
 
             const html = Object.values(risks).map(risk => {
                 const barWidth = (risk.level.value / 4) * 100;
+                const dispVal = risk.category === 'Heat Index' ? Units.format(risk.value) : `${risk.value}${risk.unit ? ' ' + risk.unit : ''}`;
                 return `
                     <div class="risk-category reveal" style="margin-bottom: 12px;">
                         <div class="risk-category__header">
@@ -328,7 +339,7 @@
                             <span class="risk-category__level" style="background: ${risk.level.color}20; color: ${risk.level.color};">${risk.level.label}</span>
                         </div>
                         <div class="risk-category__value">
-                            <span>${risk.value}${risk.unit ? ' ' + risk.unit : ''}</span>
+                            <span>${dispVal}</span>
                         </div>
                         <div class="risk-category__bar">
                             <div class="risk-category__bar-fill" style="width: ${barWidth}%; background: ${risk.level.color};"></div>
@@ -462,7 +473,8 @@
                 doc.circle(24, y - 1, 2, 'F');
                 doc.setTextColor(0, 0, 0);
                 doc.setFont('helvetica', 'bold');
-                doc.text(`${risk.category}: ${risk.value}`, 30, y);
+                const heatVal = risk.category === 'Heat Index' ? Units.format(parseFloat(risk.value)) : risk.value;
+                doc.text(`${risk.category}: ${heatVal}`, 30, y);
                 doc.setFont('helvetica', 'normal');
                 doc.setTextColor(color.r, color.g, color.b);
                 doc.text(`[${risk.level}]`, 130, y);

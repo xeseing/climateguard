@@ -72,6 +72,7 @@
             <div class="settings-panel__header"><span class="settings-panel__title">Settings</span><button class="icon-btn" id="closeSettings" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="settings-item"><div><div class="settings-item__label">Dark Mode</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="themeToggle" checked><span class="toggle__slider"></span></label></div>
             <div class="settings-item"><div><div class="settings-item__label">Animations</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="animationsToggle" checked><span class="toggle__slider"></span></label></div>
+            <div class="settings-item"><div><div class="settings-item__label" data-i18n="temperature">Temperature</div><div class="settings-item__desc" data-i18n="useCelsius">Use Celsius</div></div><label class="toggle"><input type="checkbox" class="toggle__input" id="unitsToggle" checked><span class="toggle__slider"></span></label></div>
         </aside>
 
         <nav class="tab-bar"><a href="index.html" class="tab-item"><i class="fa-solid fa-house"></i><span data-i18n="home">Home</span></a><a href="map.html" class="tab-item"><i class="fa-solid fa-map-location-dot"></i><span data-i18n="map">Map</span></a><a href="risk-report.html" class="tab-item"><i class="fa-solid fa-triangle-exclamation"></i><span data-i18n="risk">Risk</span></a><a href="trip-planner.html" class="tab-item active"><i class="fa-solid fa-route"></i><span data-i18n="trip">Trip</span></a><a href="search.html" class="tab-item"><i class="fa-solid fa-magnifying-glass"></i><span data-i18n="search">Search</span></a></nav>
@@ -119,7 +120,7 @@
                 if (summary) {
                     summary.innerHTML = `<div class="card card--no-hover" style="padding:20px;text-align:center">
                         <h3>${UI.escapeHtml(loc.name)}</h3><p style="color:var(--color-text-secondary)">${UI.escapeHtml(loc.region || '')}</p>
-                        <div style="font-size:3rem;font-weight:200;margin:12px 0">${weather.weather?.temp || weather.temp || '—'}°</div>
+                        <div style="font-size:3rem;font-weight:200;margin:12px 0">${UI.escapeHtml(Units.format(weather.weather?.temp ?? weather.temp))}</div>
                         <p style="color:var(--color-text-secondary)">${start}${end ? ' → ' + end : ''} • ${type}</p>
                         <div style="margin-top:12px"><span style="background:${risk.overallLevel?.color || '#22c55e'}20;color:${risk.overallLevel?.color || '#22c55e'};padding:4px 14px;border-radius:20px;font-weight:700;font-size:0.85rem">${risk.overallScore}/100 — ${risk.overallLevel?.label || 'Low'}</span></div>
                     </div>`;
@@ -135,7 +136,7 @@
                         const t = (weather.weather?.temp || 28) + Math.floor(Math.random() * 6 - 3);
                         const r = Math.max(0, risk.overallScore + Math.floor(Math.random() * 20 - 10));
                         const lvl = r < 30 ? { l: 'Low', c: '#22c55e' } : r < 60 ? { l: 'Moderate', c: '#eab308' } : r < 80 ? { l: 'High', c: '#f97316' } : { l: 'Extreme', c: '#ef4444' };
-                        html += `<div class="card" style="margin-bottom:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</strong><div style="font-size:0.8rem;color:var(--color-text-secondary)">Day ${i+1}</div></div><div style="text-align:right"><span style="font-size:1.3rem;font-weight:700">${t}°</span><span style="margin-left:8px;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:${lvl.c}20;color:${lvl.c}">${lvl.l}</span></div></div></div>`;
+                        html += `<div class="card" style="margin-bottom:8px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</strong><div style="font-size:0.8rem;color:var(--color-text-secondary)">Day ${i+1}</div></div><div style="text-align:right"><span style="font-size:1.3rem;font-weight:700">${UI.escapeHtml(Units.format(t))}</span><span style="margin-left:8px;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:${lvl.c}20;color:${lvl.c}">${lvl.l}</span></div></div></div>`;
                     }
                     days.innerHTML = html;
                 }
@@ -193,7 +194,7 @@
             doc.text(`Dates: ${currentTripData.start} → ${currentTripData.end || 'N/A'}`, 20, y+7);
             doc.text(`Type: ${currentTripData.type}`, 20, y+14);
             doc.text(`Risk Score: ${currentTripData.risk?.overallScore || '—'}/100 (${currentTripData.risk?.overallLevel?.label || '—'})`, 20, y+21);
-            doc.text(`Temperature: ${currentTripData.weather?.weather?.temp || '—'}°C`, 20, y+28);
+            doc.text(`Temperature: ${Units.format(currentTripData.weather?.weather?.temp)}`, 20, y+28);
             doc.save(`ClimateGuard_Trip_${currentTripData.city}.pdf`);
             UI.showNotification('Trip report downloaded!', 'success');
         });

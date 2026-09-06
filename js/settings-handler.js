@@ -35,6 +35,18 @@
             });
         }
 
+        // Units toggle (checked = Celsius); reload re-renders every surface consistently
+        const unitsToggle = document.getElementById('unitsToggle');
+        if (unitsToggle) {
+            unitsToggle.checked = s.units !== 'fahrenheit';
+            unitsToggle.addEventListener('change', e => {
+                const next = e.target.checked ? 'celsius' : 'fahrenheit';
+                if (typeof Units !== 'undefined') Units.set(next);
+                else Storage.updateSettings({ units: next });
+                if (typeof window !== 'undefined' && window.location && window.location.reload) window.location.reload();
+            });
+        }
+
         // Notification master toggle
         const notifMaster = document.getElementById('notifMaster');
         const notifGranular = document.getElementById('notifGranular');

@@ -28,6 +28,7 @@ function loadPage(fetchImpl) {
   });
   loadModule(sandbox, 'js/config.js');
   loadModule(sandbox, 'js/storage.js');
+  loadModule(sandbox, 'js/units.js');
   loadModule(sandbox, 'js/api.js');
   loadModule(sandbox, 'js/risk-engine.js');
   loadInlinePageScript(sandbox, 'risk-report.html');

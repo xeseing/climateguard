@@ -15,6 +15,7 @@ function baseSandbox() {
   const s = createSandbox();
   loadModule(s, 'js/config.js');
   loadModule(s, 'js/storage.js');
+  loadModule(s, 'js/units.js');
   loadModule(s, 'js/ui.js');
   s.UI = getGlobal(s, 'UI');
   s.Storage = getGlobal(s, 'Storage');

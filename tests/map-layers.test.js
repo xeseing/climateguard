@@ -99,9 +99,9 @@ test('keyed map adds a live temperature tile overlay', async () => {
 test('keyed markers show live fetched temps, not hardcoded values', async () => {
   const { fetchImpl } = liveFetch();
   const { markers } = await bootMap({ keyed: true, fetchImpl });
-  // Live stub returns 22.5°C → marker shows 23°; hardcoded data showed e.g. 33°/38°
-  assert.match(markers[0].opts.icon.html, /23°/);
-  assert.ok(markers.every((m) => m.opts.icon.html.includes('23°')));
+  // Live stub returns 22.5°C → marker shows 23°C via Units.format
+  assert.match(markers[0].opts.icon.html, /23°C/);
+  assert.ok(markers.every((m) => m.opts.icon.html.includes('23°C')));
 });
 
 test('layer buttons swap the tile overlay and legend', async () => {

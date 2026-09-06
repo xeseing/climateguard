@@ -20,6 +20,7 @@ function baseSandbox() {
   const sandbox = createSandbox({ setTimeout: (fn) => { fn(); return 0; } });
   loadModule(sandbox, 'js/config.js');
   loadModule(sandbox, 'js/storage.js');
+  loadModule(sandbox, 'js/units.js');
   loadModule(sandbox, 'js/ui.js');
   loadModule(sandbox, 'js/risk-engine.js');
   sandbox.UI = getGlobal(sandbox, 'UI');
