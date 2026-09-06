@@ -310,6 +310,14 @@
     text-align: center; padding: 24px; color: var(--color-text-tertiary);
     font-size: 0.85rem;
 }
+.empty-state i {
+    font-size: 1.6rem; margin-bottom: 10px; display: block;
+    color: var(--color-text-secondary);
+}
+.empty-state p { margin: 0 0 4px; }
+.empty-state__hint {
+    font-size: 0.75rem; color: var(--color-text-tertiary);
+}
 
 /* ─── PULSE GLOW ANIM ────────────────────────────────── */
 .pulse-glow, .pulse {

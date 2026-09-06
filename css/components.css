@@ -366,6 +366,23 @@
     color: var(--color-accent);
 }
 
+.tab-item:active {
+    transform: scale(0.94);
+}
+
+.tab-item:active i {
+    transform: scale(1.2);
+    color: var(--color-accent);
+}
+
+/* Fluid hero temperature: full size on phones, shrinks on narrow screens */
+.hero-temp {
+    font-size: clamp(4.5rem, 22vw, 8rem);
+    font-weight: 200;
+    letter-spacing: -0.06em;
+    line-height: 1;
+}
+
 /* ===========================
    FORM ELEMENTS
 =========================== */
