@@ -22,20 +22,30 @@ function createStorage() {
 
 function createDocumentStub() {
   const elements = new Map();
+  const docListeners = [];
   const makeEl = (id) => ({
     id,
     innerHTML: '',
     textContent: '',
+    value: '',
     style: {},
+    dataset: {},
+    __listeners: [],
     classList: { add() {}, remove() {}, toggle() {}, contains: () => false },
     setAttribute() {},
     getAttribute: () => null,
-    addEventListener() {},
+    addEventListener(type, fn) { makeEl.listenersOf(this).push({ type, fn }); },
     querySelector: () => null,
     querySelectorAll: () => [],
+    appendChild() {},
+    insertBefore() {},
+    prepend() {},
+    remove() {},
   });
-  return {
+  makeEl.listenersOf = (el) => el.__listeners;
+  const doc = {
     __elements: elements,
+    __docListeners: docListeners,
     getElementById: (id) => {
       if (!elements.has(id)) elements.set(id, makeEl(id));
       return elements.get(id);
@@ -43,11 +53,12 @@ function createDocumentStub() {
     querySelector: () => null,
     querySelectorAll: () => [],
     createElement: () => makeEl(''),
-    addEventListener() {},
+    addEventListener(type, fn) { docListeners.push({ type, fn }); },
     dispatchEvent() {},
     body: makeEl('body'),
     documentElement: makeEl('html'),
   };
+  return doc;
 }
 
 /** Build a fresh sandbox with browser globals. */
@@ -68,6 +79,9 @@ function createSandbox(extra = {}) {
   };
   sandbox.window = sandbox; // window === globalThis approximation
   sandbox.globalThis = sandbox;
+  sandbox.__winListeners = [];
+  sandbox.addEventListener = (type, fn) => sandbox.__winListeners.push({ type, fn });
+  sandbox.removeEventListener = () => {};
   vm.createContext(sandbox);
   return sandbox;
 }
@@ -105,4 +119,36 @@ function withMatchMedia(sandbox, matches = false) {
   return sandbox;
 }
 
-module.exports = { createSandbox, loadModule, getGlobal, loadInlinePageScript, withMatchMedia, createStorage, createDocumentStub };
+/**
+ * Load every <script src="../js/..."> of a page in order, then its inline script.
+ * Returns the sandbox. Timers/DOMContentLoaded are left to the caller.
+ */
+function loadPageScripts(sandbox, pageFile) {
+  const abs = path.join(__dirname, '..', 'pages', pageFile);
+  const html = fs.readFileSync(abs, 'utf8');
+  for (const m of html.matchAll(/<script src="\.\.\/(js\/[^"]+)"><\/script>/g)) {
+    loadModule(sandbox, m[1]);
+  }
+  loadInlinePageScript(sandbox, pageFile);
+  return sandbox;
+}
+
+/** Invoke recorded DOMContentLoaded listeners; awaiting settles async inits. */
+async function fireDOMContentLoaded(sandbox) {
+  const fns = sandbox.document.__docListeners
+    .filter((l) => l.type === 'DOMContentLoaded')
+    .map((l) => l.fn);
+  const results = await Promise.allSettled(fns.map((fn) => fn()));
+  const rejected = results.filter((r) => r.status === 'rejected');
+  if (rejected.length) throw rejected[0].reason;
+}
+
+/** Count listeners of a type registered on a stub element. */
+function countListeners(el, type) {
+  return (el.__listeners || []).filter((l) => l.type === type).length;
+}
+
+module.exports = {
+  createSandbox, loadModule, getGlobal, loadInlinePageScript, loadPageScripts,
+  fireDOMContentLoaded, countListeners, withMatchMedia, createStorage, createDocumentStub,
+};

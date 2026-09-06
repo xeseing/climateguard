@@ -33,7 +33,7 @@
 | BUG-03 | 🟠 | Deprecated OWM UV endpoint (`/data/2.5/uvi` retired) → UV silently falls back to hardcoded `6` | ✅ FIXED | `npm test` (api-current) + lint |
 | BUG-04 | 🟠 | Stored/reflected XSS via `innerHTML`: trip city, search results, compare cities, emergency contacts, popular cities (no escaping anywhere) | ✅ FIXED | `npm test` (xss) + lint + handler grep |
 | BUG-05 | 🟠 | Hardcoded OpenWeatherMap API key in `js/config.js` (committed secret) | ✅ FIXED | `npm test` (api-key) + lint |
-| BUG-06 | 🟠 | Trip planner double-binding: `trip-planner.js` + page inline script both handle `#analyzeBtn` → double render / conflicting output, `#verdictCard` only in one path | TODO | — |
+| BUG-06 | 🟠 | Trip planner double-binding: `trip-planner.js` + page inline script both handle `#analyzeBtn` → double render / conflicting output, `#verdictCard` only in one path | ✅ FIXED | `npm test` (trip-bindings) + lint |
 | BUG-07 | 🟡 | `getCurrentLocation()` swallows denial errors, resolves SF fallback → "Use Current Location" silently teleports user to San Francisco | TODO | — |
 | BUG-08 | 🟡 | `searchLocations()` returns `[]` with no API key instead of local-DB fallback → search dead offline/keyless | TODO | — |
 | BUG-09 | 🟡 | Risk report race: page waits fixed 800 ms then reads possibly-stale/missing `LAST_WEATHER` cache, silently falls back to SF mock | TODO | — |
@@ -90,7 +90,12 @@
 - **Verify:** `npm test` 32/32 (4 new `api-key` tests incl. secret-scan regression); `npm run lint` clean.
 - **Files:** `js/config.js`, `js/api.js`, `.gitignore`, `tests/api-key.test.js`, `tests/api-current.test.js`, `tests/api-forecast.test.js`
 
-*(next: BUG-06)*
+### BUG-06 — Single trip-page owner ✅ FIXED (attempt 1)
+- **Change:** removed `<script src="../js/trip-planner.js">` from `trip-planner.html` (inline script is the single owner of `#analyzeBtn`/`#downloadTripBtn`/`.quick-dest`); ported default-date prefill (today → +7d) into the inline script; deleted now-dead `js/trip-planner.js` (symbols self-contained — verified by grep). Test helpers gained listener recording, `loadPageScripts`, `fireDOMContentLoaded`, `countListeners`.
+- **Verify:** `npm test` 36/36 (4 new `trip-bindings` tests: no module include, exactly-1 listener ×2, date defaults); `npm run lint` clean.
+- **Files:** `pages/trip-planner.html`, `js/trip-planner.js` (deleted), `tests/helpers.js`, `tests/trip-bindings.test.js`
+
+*(next: BUG-07)*
 
 ---
 
