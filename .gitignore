@@ -1,0 +1,4 @@
+# Local-only API key override (never commit) — defines window.CLIMATEGUARD_API_KEY
+js/config.local.js
+
+node_modules/

@@ -6,6 +6,11 @@
 
 const WeatherAPI = (function () {
     function getApiKey() {
+        try {
+            const override = (typeof localStorage !== 'undefined') ? localStorage.getItem('climateguard_api_key') : null;
+            if (override) return override;
+        } catch { /* storage unavailable, fall through */ }
+        if (typeof window !== 'undefined' && window.CLIMATEGUARD_API_KEY) return window.CLIMATEGUARD_API_KEY;
         return (typeof CONFIG !== 'undefined' && CONFIG.API_KEY) ? CONFIG.API_KEY : '';
     }
     function getBaseUrl() {

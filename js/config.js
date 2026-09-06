@@ -4,8 +4,12 @@
  */
 
 const CONFIG = {
-    // OpenWeatherMap API Key — change this to your own key
-    API_KEY: 'b2e9edf39bf3bd1594c4d9a41cee359f',
+    // OpenWeatherMap API Key — NEVER commit a real key here.
+    // Provide it at runtime instead (first match wins):
+    //   1. localStorage key  'climateguard_api_key'
+    //   2. window.CLIMATEGUARD_API_KEY (e.g. via an untracked js/config.local.js)
+    //   3. this default (keep empty in the repo)
+    API_KEY: '',
 
     // API Endpoints
     OWM_BASE: 'https://api.openweathermap.org/data/2.5',

@@ -32,7 +32,7 @@
 | BUG-02 | 🟠 | `getWeeklyForecast()` ignores lat/lon, always returns random mock data presented as a real forecast | ✅ FIXED | `npm test` (api-forecast) + lint |
 | BUG-03 | 🟠 | Deprecated OWM UV endpoint (`/data/2.5/uvi` retired) → UV silently falls back to hardcoded `6` | ✅ FIXED | `npm test` (api-current) + lint |
 | BUG-04 | 🟠 | Stored/reflected XSS via `innerHTML`: trip city, search results, compare cities, emergency contacts, popular cities (no escaping anywhere) | ✅ FIXED | `npm test` (xss) + lint + handler grep |
-| BUG-05 | 🟠 | Hardcoded OpenWeatherMap API key in `js/config.js` (committed secret) | TODO | — |
+| BUG-05 | 🟠 | Hardcoded OpenWeatherMap API key in `js/config.js` (committed secret) | ✅ FIXED | `npm test` (api-key) + lint |
 | BUG-06 | 🟠 | Trip planner double-binding: `trip-planner.js` + page inline script both handle `#analyzeBtn` → double render / conflicting output, `#verdictCard` only in one path | TODO | — |
 | BUG-07 | 🟡 | `getCurrentLocation()` swallows denial errors, resolves SF fallback → "Use Current Location" silently teleports user to San Francisco | TODO | — |
 | BUG-08 | 🟡 | `searchLocations()` returns `[]` with no API key instead of local-DB fallback → search dead offline/keyless | TODO | — |
@@ -85,7 +85,12 @@
 - **Verify:** `npm test` 28/28 (6 new `xss` tests incl. inline page-script loading); `npm run lint` clean; grep confirms zero interpolated inline handlers / raw phone hrefs.
 - **Files:** `js/app.js`, `pages/compare.html`, `pages/emergency.html`, `pages/trip-planner.html`, `tests/helpers.js`, `tests/xss.test.js`
 
-*(next: BUG-05)*
+### BUG-05 — Committed API secret removed ✅ FIXED (attempt 2; attempt 1 = fixtures relied on embedded key)
+- **Change:** `js/config.js` `API_KEY` default is now `''` with runtime-override docs; `getApiKey()` resolves `localStorage 'climateguard_api_key'` → `window.CLIMATEGUARD_API_KEY` → config default. Added `.gitignore` for `js/config.local.js`. Older fixtures updated to seed the override seam. NOTE: keyless installs run on mock data + (after BUG-08) local search DB; Phase 3 should add a settings UI field for the key.
+- **Verify:** `npm test` 32/32 (4 new `api-key` tests incl. secret-scan regression); `npm run lint` clean.
+- **Files:** `js/config.js`, `js/api.js`, `.gitignore`, `tests/api-key.test.js`, `tests/api-current.test.js`, `tests/api-forecast.test.js`
+
+*(next: BUG-06)*
 
 ---
 

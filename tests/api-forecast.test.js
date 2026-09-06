@@ -14,6 +14,7 @@ function loadAPI(fetchImpl) {
   loadModule(sandbox, 'js/api.js');
   sandbox.WeatherAPI = getGlobal(sandbox, 'WeatherAPI');
   sandbox.CONFIG = getGlobal(sandbox, 'CONFIG');
+  sandbox.localStorage.setItem('climateguard_api_key', 'TEST_KEY');
   return sandbox;
 }
 
@@ -78,7 +79,7 @@ test('falls back to mock without fetching when coords/key missing', async () => 
   const sandbox = loadAPI(async () => { calls++; return { ok: true, json: async () => ({ list: [] }) }; });
   assert.equal((await sandbox.WeatherAPI.getWeeklyForecast(undefined, undefined)).length, 7);
   assert.equal((await sandbox.WeatherAPI.getWeeklyForecast(NaN, 72.87)).length, 7);
-  sandbox.CONFIG.API_KEY = '';
+  sandbox.localStorage.removeItem('climateguard_api_key');
   assert.equal((await sandbox.WeatherAPI.getWeeklyForecast(19.07, 72.87)).length, 7);
   assert.equal(calls, 0);
 });

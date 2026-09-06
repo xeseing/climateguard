@@ -12,6 +12,7 @@ function loadAPI(fetchImpl) {
   loadModule(sandbox, 'js/config.js');
   loadModule(sandbox, 'js/api.js');
   sandbox.WeatherAPI = getGlobal(sandbox, 'WeatherAPI');
+  sandbox.localStorage.setItem('climateguard_api_key', 'TEST_KEY');
   return sandbox;
 }
 
