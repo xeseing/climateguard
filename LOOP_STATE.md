@@ -29,7 +29,7 @@
 | ID | Sev | Title | Status | Verified |
 |---|---|---|---|---|
 | BUG-01 | 🔴 | `hourly.html` / `weekly.html` are dead AND orphan: no render logic (no `app.js` page handler, no inline JS) and zero inbound links | ✅ FIXED | `npm test` (ui-render) + `node --check` + link grep |
-| BUG-02 | 🟠 | `getWeeklyForecast()` ignores lat/lon, always returns random mock data presented as a real forecast | TODO | — |
+| BUG-02 | 🟠 | `getWeeklyForecast()` ignores lat/lon, always returns random mock data presented as a real forecast | ✅ FIXED | `npm test` (api-forecast) + lint |
 | BUG-03 | 🟠 | Deprecated OWM UV endpoint (`/data/2.5/uvi` retired) → UV silently falls back to hardcoded `6` | TODO | — |
 | BUG-04 | 🟠 | Stored/reflected XSS via `innerHTML`: trip city, search results, compare cities, emergency contacts, popular cities (no escaping anywhere) | TODO | — |
 | BUG-05 | 🟠 | Hardcoded OpenWeatherMap API key in `js/config.js` (committed secret) | TODO | — |
@@ -47,7 +47,7 @@
 | BUG-17 | 🔵 | Theme applied twice (`Theme.init` + `settings-handler` direct DOM manipulation, bypassing `Theme.applyTheme`) | TODO | — |
 | BUG-18 | 🔵 | `Storage.getSettings()` returns live `DEFAULT_SETTINGS` reference when empty (mutation risk); `units` setting dead (no UI/conversion) | TODO | — |
 | BUG-19 | 🔵 | Missing CSS: `.offline-banner`, `.api-error-card` (JS injects them unstyled); `Notification.icon: '🌤️'` invalid | TODO | — |
-| BUG-20 | 🔵 | `getHourlyForecast(undefined, undefined)` builds `lat=undefined` URL (caught, but sloppy); `mapCond('Clouds')` never yields `partly_cloudy` | TODO | — |
+| BUG-20 | 🔵 | ~~`lat=undefined` URL guard~~ (done in BUG-02); `mapCond('Clouds')` never yields `partly_cloudy` | TODO | — |
 
 **Architectural notes (feed Phase 3):** no PWA manifest/service worker despite offline claims; per-page script-tag soup (13 tags, order-sensitive globals); mock data silently substituted for live data in several paths — should be badged "demo data" when used.
 
@@ -70,7 +70,12 @@
 - **Verify:** `npm test` 15/15 pass (`tests/risk-engine` 8 + `tests/ui-render` 7); `npm run lint` clean; grep confirms inbound links to `hourly.html`/`weekly.html`.
 - **Files:** `js/ui.js`, `js/app.js`, `pages/index.html`, `tests/ui-render.test.js`
 
-*(next: BUG-02)*
+### BUG-02 — Real weekly forecast aggregation ✅ FIXED (attempt 2; attempt 1 = test-fixture date spill)
+- **Change:** `js/api.js`: `getWeeklyForecast(lat, lon)` now fetches `/forecast?cnt=40`, groups into UTC-day summaries via `aggregateDaily()` (high/low, dominant condition, max precip, avg humidity, `uvIndex: null` = unknown); per-coords cache + mock fallback; `validCoords()` guard added to both forecast fns (no more `lat=undefined` URLs).
+- **Verify:** `npm test` 20/20 (5 new `api-forecast` tests); `npm run lint` clean.
+- **Files:** `js/api.js`, `tests/api-forecast.test.js`
+
+*(next: BUG-03)*
 
 ---
 

@@ -238,9 +238,9 @@ const WeatherAPI = (function () {
     // ─── Forecasts (use 5-day / 3-hour API) ──────────────────
     async function getHourlyForecast(lat, lon) {
         const key = getApiKey();
-        if (!key) return generateHourly();
+        if (!key || !validCoords(lat, lon)) return generateHourly();
 
-        const ck = `hourly_${lat?.toFixed(2)}_${lon?.toFixed(2)}`;
+        const ck = `hourly_${lat.toFixed(2)}_${lon.toFixed(2)}`;
         const cached = cacheGet(ck);
         if (cached) return cached;
 
@@ -268,8 +268,67 @@ const WeatherAPI = (function () {
         }
     }
 
+    function validCoords(lat, lon) {
+        return typeof lat === 'number' && typeof lon === 'number' && isFinite(lat) && isFinite(lon);
+    }
+
+    // Group 3-hourly /forecast items into daily summaries
+    function aggregateDaily(list) {
+        const names = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const groups = new Map();
+        for (const item of list) {
+            if (!item || !item.dt) continue;
+            const key = new Date(item.dt * 1000).toISOString().slice(0, 10); // UTC calendar day
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(item);
+        }
+        let first = true;
+        return [...groups.entries()].map(([key, items]) => {
+            const temps = items.map(i => i.main?.temp).filter(t => typeof t === 'number');
+            const hums = items.map(i => i.main?.humidity).filter(h => typeof h === 'number');
+            const pops = items.map(i => Math.round((i.pop || 0) * 100));
+            const votes = {};
+            for (const i of items) {
+                const c = mapCond(i.weather?.[0]?.main || 'Clear', true);
+                votes[c] = (votes[c] || 0) + 1;
+            }
+            const condition = Object.keys(votes).sort((a, b) => votes[b] - votes[a])[0] || 'clear_day';
+            const dt = new Date(items[0].dt * 1000);
+            const day = {
+                date: dt.toISOString(),
+                dayName: first ? 'Today' : names[dt.getUTCDay()],
+                condition, conditionText: condLabel(condition),
+                conditionIcon: iconFor(condition, true),
+                tempHigh: temps.length ? Math.round(Math.max(...temps)) : null,
+                tempLow: temps.length ? Math.round(Math.min(...temps)) : null,
+                precipitation: pops.length ? Math.max(...pops) : 0,
+                humidity: hums.length ? Math.round(hums.reduce((a, b) => a + b, 0) / hums.length) : null,
+                uvIndex: null // not provided by /forecast; null = unknown (UI shows —)
+            };
+            first = false;
+            return day;
+        });
+    }
+
     async function getWeeklyForecast(lat, lon) {
-        return generateWeekly();
+        const key = getApiKey();
+        if (!key || !validCoords(lat, lon)) return generateWeekly();
+
+        const ck = `weekly_${lat.toFixed(2)}_${lon.toFixed(2)}`;
+        const cached = cacheGet(ck);
+        if (cached) return cached;
+
+        try {
+            const res = await fetch(`${getBaseUrl()}/forecast?lat=${lat}&lon=${lon}&appid=${key}&units=metric&cnt=40`);
+            if (!res.ok) throw new Error('Forecast error');
+            const data = await res.json();
+            const days = aggregateDaily(data.list || []);
+            if (!days.length) return generateWeekly();
+            cacheSet(ck, days);
+            return days;
+        } catch {
+            return generateWeekly();
+        }
     }
 
     // ─── Geolocation ─────────────────────────────────────────
