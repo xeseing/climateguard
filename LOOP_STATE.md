@@ -115,57 +115,63 @@
 - **Verify:** `npm test` 51/51 (4 new `map-layers` tests with Leaflet stub: overlay URL, live temps, layer swap + legend, keyless honesty); `npm run lint` clean.
 - **Files:** `pages/map.html`, `tests/map-layers.test.js`
 
-### BUG-11 — Valid snow fill styles ✅ FIXED (attempt 2; attempt 1 = test also captured legit CanvasGradient objects)
+### BUG-11 — Valid snow fill styles ✅ FIXED (attempt 2 · commit `bb6ccf4`; attempt 1 = test also captured legit CanvasGradient objects)
 - **Change:** `particles.js` gains `withAlpha()` (rebuilds `rgb()/rgba()` with clamped alpha) used by `drawSnowParticle`; string-append hack removed.
 - **Verify:** `npm test` 53/53 (2 new `particles` tests: single-frame render asserts every string fill matches valid `rgba()`, alpha varies); `npm run lint` clean.
 - **Files:** `js/particles.js`, `tests/particles.test.js`
 
-### BUG-12 — Live home-card values ✅ FIXED (attempt 1)
+### BUG-12 — Live home-card values ✅ FIXED (attempt 1 · commit `709b300`)
 - **Change:** `UI.updateWeatherDisplay` now drives precip value, compass-needle rotation, humidity-gauge arc, pressure-gauge arc (same staleness pattern, included), and Magnus dew point; `initCharts(hourly)` renders real hourly labels/precip (no data → no chart, never fake). New element IDs in `index.html`; `initCharts` exposed for testability.
 - **Verify:** `npm test` 59/59 (6 new `ui-weather-display` tests); `npm run lint` clean.
 - **Files:** `js/ui.js`, `js/app.js`, `pages/index.html`, `tests/ui-weather-display.test.js`
 
-### BUG-13 — i18n coverage ✅ FIXED (attempt 1)
+### BUG-13 — i18n coverage ✅ FIXED (attempt 1 · commit `a295892`)
 - **Change:** tagged ~90 strings across all 9 pages (`data-i18n`/`-placeholder`/`-aria`): every tab bar, page headers, section titles, form labels/options, buttons, contact placeholders; added 14 new keys × 5 languages (en/hi/es/fr/ar). Applied via assertion-checked all-or-nothing script (exact-match counts verified pre-write). Corrected audit nit: repo has 9 pages, not 8.
 - **Verify:** `npm test` 63/63 (4 new `i18n-coverage` tests: ≥70 tags, per-page tab keys, 5-language key parity, switch behavior incl. RTL); `npm run lint` clean.
 - **Files:** `js/i18n.js`, all `pages/*.html`, `tests/i18n-coverage.test.js`
 
-### BUG-14 — jsPDF failure guards ✅ FIXED (attempt 1)
+### BUG-14 — jsPDF failure guards ✅ FIXED (attempt 1 · commit `5e1c342`)
 - **Change:** all three PDF entry points (`risk-report` download, `compare` export, `trip` download) now check `window.jspdf?.jsPDF` and show an error toast instead of throwing when the CDN is blocked.
 - **Verify:** `npm test` 67/67 (4 new `pdf-guards` tests: 3 graceful-degradation + 1 positive save-path); `npm run lint` clean.
 - **Files:** `pages/risk-report.html`, `pages/compare.html`, `pages/trip-planner.html`, `tests/pdf-guards.test.js`
 
-### BUG-15 — Parallel destination loading ✅ FIXED (attempt 1)
+### BUG-15 — Parallel destination loading ✅ FIXED (attempt 1 · commit `bc4260b`)
 - **Change:** `renderPopularDestinations` now fetches all 6 cities via one `Promise.all` (order-preserving, per-card error tolerance kept); exposed on `App` for testability.
 - **Verify:** `npm test` 69/69 (2 new `popular-dest` tests: 6-in-flight concurrency probe, 6 cards render); `npm run lint` clean.
 - **Files:** `js/app.js`, `tests/popular-dest.test.js`
 
-### BUG-16 — Root landing redirect ✅ FIXED (attempt 1)
+### BUG-16 — Root landing redirect ✅ FIXED (attempt 1 · commit `2a780d2`)
 - **Change:** new root `index.html` — instant meta-refresh + `location.replace` to `pages/index.html`, canonical link, fallback anchor, themed stub body.
 - **Verify:** `npm test` 71/71 (2 new `root-index` tests); `npm run lint` clean.
 - **Files:** `index.html`, `tests/root-index.test.js`
 
-### BUG-17 — Single-source theme ✅ FIXED (attempt 1)
+### BUG-17 — Single-source theme ✅ FIXED (attempt 1 · commit `8a43f47`)
 - **Change:** settings toggle now persists + delegates to `Theme.applyTheme()`; removed the duplicated load-time DOM application (`Theme.init` already handles it, incl. meta theme-color + transitions).
 - **Verify:** `npm test` 73/73 (2 new `theme-single-source` tests: toggle round-trips `Theme.getTheme()` + storage); `npm run lint` clean.
 - **Files:** `js/settings-handler.js`, `tests/theme-single-source.test.js`
 
-### BUG-18 — Settings object integrity ✅ FIXED (attempt 1)
+### BUG-18 — Settings object integrity ✅ FIXED (attempt 1 · commit `9cf4ca7`)
 - **Change:** `getSettings()` returns a fresh `{...DEFAULTS, ...stored}` merge (corrupt/non-object store heals to defaults); the live-`DEFAULT_SETTINGS` mutation vector is gone. The dead `units` toggle is explicitly deferred to Phase 3 roadmap item 3 (°C/°F wiring).
 - **Verify:** `npm test` 76/76 (3 new `storage-settings` tests: mutation isolation, partial merge, update round-trip); `npm run lint` clean.
 - **Files:** `js/storage.js`, `tests/storage-settings.test.js`
 
-### BUG-19 — Offline/error styling + valid Notifications ✅ FIXED (attempt 3; attempts 1–2 = test sandbox stubs for canvas/CustomEvent)
+### BUG-19 — Offline/error styling + valid Notifications ✅ FIXED (attempt 3 · commit `ed51e25`; attempts 1–2 = test sandbox stubs for canvas/CustomEvent)
 - **Change:** added `.offline-banner` / `.api-error-card` styles to `components.css`; `fireNotification` no longer passes the invalid emoji `icon`.
 - **Verify:** `npm test` 79/79 (3 new `offline-ui` tests: 2 CSS-rule assertions + full index boot asserting the fired Notification has no `icon` key); `npm run lint` clean.
 - **Files:** `css/components.css`, `js/app.js`, `tests/offline-ui.test.js`
 
-### BUG-20 — Cloud-cover-aware conditions ✅ FIXED (attempt 1)
+### BUG-20 — Cloud-cover-aware conditions ✅ FIXED (attempt 1 · commit `20e4e7c`)
 - **Change:** `mapCond(main, isDay, cloudCover)` splits `Clouds` by cover (≤20% → clear day/night, ≤60% → partly_cloudy, else cloudy; unknown cover keeps prior `cloudy`); all three call sites (current, hourly, weekly aggregation) pass `clouds.all`.
 - **Verify:** `npm test` 83/83 (4 new `mapcond` tests: day split, night, hourly, weekly votes); `npm run lint` clean.
 - **Files:** `js/api.js`, `tests/mapcond.test.js`
 
 ## PHASE 2 — COMPLETE (20/20, 83 tests green, lint clean)
+
+**Final tally (2026-09-07):** 20/20 bugs fixed, each red→green with regression tests.
+- Suite: **83/83 pass** across 17 test files (`npm test`); **lint clean** (`npm run lint`).
+- Commits: `07dc695` (01) · `e9f7c74` (02) · `365dcd8` (03) · `8a5f322` (04) · `d5caf7b` (05) · `bd723e9` (06) · `fbade42` (07) · `b75c024` (08) · `c5b38b7` (09) · `4f3d47c` (10) · `bb6ccf4` (11) · `709b300` (12) · `a295892` (13) · `5e1c342` (14) · `bc4260b` (15) · `2a780d2` (16) · `8a43f47` (17) · `9cf4ca7` (18) · `ed51e25` (19) · `20e4e7c` (20).
+- Deferred to Phase 3 by design: `units` °C/°F wiring (roadmap item 3), mock-data badging (item 1), PWA/offline shell (item 4), root landing already done (item 5 ✔ via BUG-16), map live layers already done (item 2 ✔ via BUG-10).
+- Known remaining nits (not in register): pressure-gauge static text companions, gust value static, dynamic JS-rendered strings untranslated, SF-edge mock acceptance in risk-report coords check (proper fix = mock flag from item 1).
 
 ---
 
