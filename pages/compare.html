@@ -87,7 +87,7 @@
                 const w = d.weather;
                 const cls = d.city === safest.city ? 'safest' : (d.city === riskiest.city ? 'riskiest' : '');
                 const badge = d.city === safest.city ? ' 🟢 Safest' : (d.city === riskiest.city ? ' 🔴 Riskiest' : '');
-                html += `<tr class="${cls}"><td><strong>${d.city}</strong>${badge}</td><td>${w.temp ?? '—'}°</td><td>${w.humidity ?? '—'}%</td><td>${w.windSpeed ?? '—'} km/h</td><td>${w.uvIndex ?? '—'}</td><td>${w.airQuality ?? '—'}</td><td style="color:${d.risk.overallLevel?.color || 'inherit'}">${d.risk.overallScore}/100 ${d.risk.overallLevel?.label || ''}</td></tr>`;
+                html += `<tr class="${cls}"><td><strong>${UI.escapeHtml(d.city)}</strong>${badge}</td><td>${w.temp ?? '—'}°</td><td>${w.humidity ?? '—'}%</td><td>${w.windSpeed ?? '—'} km/h</td><td>${w.uvIndex ?? '—'}</td><td>${w.airQuality ?? '—'}</td><td style="color:${d.risk.overallLevel?.color || 'inherit'}">${d.risk.overallScore}/100 ${d.risk.overallLevel?.label || ''}</td></tr>`;
             });
             html += '</tbody>';
             table.innerHTML = html;

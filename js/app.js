@@ -244,6 +244,7 @@ const App = (function() {
         const trips = Storage.getTripReminders();
         if (!trips.length) { container.innerHTML = '<p class="empty-state">No saved trips yet</p>'; return; }
         const now = Date.now();
+        const esc = (typeof UI !== 'undefined' && UI.escapeHtml) ? UI.escapeHtml : String;
         container.innerHTML = trips.map(trip => {
             const tripDate = new Date(trip.date).getTime();
             const diff = tripDate - now;
@@ -263,13 +264,16 @@ const App = (function() {
             return `<div class="countdown-item ${cls}">
                 <div class="countdown-item__info">
                     <i class="fa-solid fa-plane"></i>
-                    <span>${trip.city || trip.destination}</span>
-                    <span class="countdown-item__date">${new Date(trip.date).toLocaleDateString()}</span>
+                    <span>${esc(trip.city || trip.destination)}</span>
+                    <span class="countdown-item__date">${esc(new Date(trip.date).toLocaleDateString())}</span>
                 </div>
                 ${badge}
-                <button class="countdown-item__remove" onclick="App.removeTrip('${trip.id}')" aria-label="Remove trip"><i class="fa-solid fa-xmark"></i></button>
+                <button class="countdown-item__remove" data-trip-id="${esc(trip.id)}" aria-label="Remove trip"><i class="fa-solid fa-xmark"></i></button>
             </div>`;
         }).join('');
+        container.querySelectorAll('.countdown-item__remove').forEach(btn => {
+            btn.addEventListener('click', () => removeTrip(btn.dataset ? btn.dataset.tripId : btn.getAttribute('data-trip-id')));
+        });
     }
 
     function removeTrip(id) {
@@ -337,10 +341,11 @@ const App = (function() {
         if (!container) return;
         const recent = Storage.getRecentLocations();
         if (!recent.length) { container.innerHTML = '<p style="color:var(--color-text-secondary);padding:16px">No recent searches</p>'; return; }
+        const esc = (typeof UI !== 'undefined' && UI.escapeHtml) ? UI.escapeHtml : String;
         container.innerHTML = recent.map(loc => `
-            <div class="list-item" data-lat="${loc.lat}" data-lon="${loc.lon}" data-name="${loc.name}" data-region="${loc.region || loc.country || ''}">
+            <div class="list-item" data-lat="${loc.lat}" data-lon="${loc.lon}" data-name="${esc(loc.name)}" data-region="${esc(loc.region || loc.country || '')}">
                 <i class="fa-solid fa-clock-rotate-left" style="color:var(--color-text-secondary)"></i>
-                <span style="flex:1">${loc.name}, ${loc.region || loc.country || ''}</span>
+                <span style="flex:1">${esc(loc.name)}, ${esc(loc.region || loc.country || '')}</span>
                 <i class="fa-solid fa-chevron-right" style="color:var(--color-text-tertiary)"></i>
             </div>`).join('');
         container.querySelectorAll('.list-item').forEach(item => {
@@ -354,12 +359,13 @@ const App = (function() {
     function renderSearchResults(results, container) {
         if (!container) return;
         if (!results.length) { container.innerHTML = '<p style="color:var(--color-text-secondary);padding:16px">No results found</p>'; return; }
+        const esc = (typeof UI !== 'undefined' && UI.escapeHtml) ? UI.escapeHtml : String;
         container.innerHTML = results.map(loc => `
-            <div class="list-item" data-lat="${loc.lat}" data-lon="${loc.lon}" data-name="${loc.name}" data-region="${loc.region || ''}">
+            <div class="list-item" data-lat="${loc.lat}" data-lon="${loc.lon}" data-name="${esc(loc.name)}" data-region="${esc(loc.region || '')}">
                 <div class="list-item__icon"><i class="fa-solid fa-city"></i></div>
                 <div class="list-item__content">
-                    <div class="list-item__title">${loc.name}</div>
-                    <div class="list-item__subtitle">${loc.region || ''}</div>
+                    <div class="list-item__title">${esc(loc.name)}</div>
+                    <div class="list-item__subtitle">${esc(loc.region || '')}</div>
                 </div>
                 <i class="fa-solid fa-chevron-right" style="color:var(--color-text-tertiary)"></i>
             </div>`).join('');
@@ -468,7 +474,8 @@ const App = (function() {
 
     return {
         init, loadWeather, refreshWeather, setDemoWeather,
-        removeTrip, selectLocation,
+        removeTrip, selectLocation, renderTripCountdowns,
+        renderSearchResults, renderRecentSearches,
         getState: () => ({ ...state })
     };
 })();

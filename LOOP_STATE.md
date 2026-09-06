@@ -31,7 +31,7 @@
 | BUG-01 | 🔴 | `hourly.html` / `weekly.html` are dead AND orphan: no render logic (no `app.js` page handler, no inline JS) and zero inbound links | ✅ FIXED | `npm test` (ui-render) + `node --check` + link grep |
 | BUG-02 | 🟠 | `getWeeklyForecast()` ignores lat/lon, always returns random mock data presented as a real forecast | ✅ FIXED | `npm test` (api-forecast) + lint |
 | BUG-03 | 🟠 | Deprecated OWM UV endpoint (`/data/2.5/uvi` retired) → UV silently falls back to hardcoded `6` | ✅ FIXED | `npm test` (api-current) + lint |
-| BUG-04 | 🟠 | Stored/reflected XSS via `innerHTML`: trip city, search results, compare cities, emergency contacts, popular cities (no escaping anywhere) | TODO | — |
+| BUG-04 | 🟠 | Stored/reflected XSS via `innerHTML`: trip city, search results, compare cities, emergency contacts, popular cities (no escaping anywhere) | ✅ FIXED | `npm test` (xss) + lint + handler grep |
 | BUG-05 | 🟠 | Hardcoded OpenWeatherMap API key in `js/config.js` (committed secret) | TODO | — |
 | BUG-06 | 🟠 | Trip planner double-binding: `trip-planner.js` + page inline script both handle `#analyzeBtn` → double render / conflicting output, `#verdictCard` only in one path | TODO | — |
 | BUG-07 | 🟡 | `getCurrentLocation()` swallows denial errors, resolves SF fallback → "Use Current Location" silently teleports user to San Francisco | TODO | — |
@@ -80,7 +80,12 @@
 - **Verify:** `npm test` 22/22 (2 new `api-current` tests: rounding/URL assertions, null-on-failure); `npm run lint` clean.
 - **Files:** `js/api.js`, `tests/api-current.test.js`
 
-*(next: BUG-04)*
+### BUG-04 — XSS remediation ✅ FIXED (attempt 1)
+- **Change:** all user/API-controlled strings escaped via `UI.escapeHtml` at `innerHTML` sinks: `app.js` trip countdowns, recent + search results; `compare.html` city cells; `emergency.html` contact fields; `trip-planner.html` summary + verdict. Inline `onclick="…${id}…"` handlers replaced with `data-*-id` + delegated listeners (escaping alone is unsafe in handler attributes). Phone numbers whitelisted (`sanitizePhone`) before `tel:`/`sms:` hrefs. `App` now exposes the three render fns for testability. Static-DB sinks (popular cities, map markers) audited — not user-controlled, left as-is.
+- **Verify:** `npm test` 28/28 (6 new `xss` tests incl. inline page-script loading); `npm run lint` clean; grep confirms zero interpolated inline handlers / raw phone hrefs.
+- **Files:** `js/app.js`, `pages/compare.html`, `pages/emergency.html`, `pages/trip-planner.html`, `tests/helpers.js`, `tests/xss.test.js`
+
+*(next: BUG-05)*
 
 ---
 

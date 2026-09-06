@@ -108,7 +108,7 @@
                 const summary = document.getElementById('tripSummary');
                 if (summary) {
                     summary.innerHTML = `<div class="card card--no-hover" style="padding:20px;text-align:center">
-                        <h3>${loc.name}</h3><p style="color:var(--color-text-secondary)">${loc.region || ''}</p>
+                        <h3>${UI.escapeHtml(loc.name)}</h3><p style="color:var(--color-text-secondary)">${UI.escapeHtml(loc.region || '')}</p>
                         <div style="font-size:3rem;font-weight:200;margin:12px 0">${weather.weather?.temp || weather.temp || '—'}°</div>
                         <p style="color:var(--color-text-secondary)">${start}${end ? ' → ' + end : ''} • ${type}</p>
                         <div style="margin-top:12px"><span style="background:${risk.overallLevel?.color || '#22c55e'}20;color:${risk.overallLevel?.color || '#22c55e'};padding:4px 14px;border-radius:20px;font-weight:700;font-size:0.85rem">${risk.overallScore}/100 — ${risk.overallLevel?.label || 'Low'}</span></div>
@@ -147,7 +147,7 @@
             if (score < 35) { verdict = 'Go!'; icon = '✅'; cls = 'verdict-card--go'; reasons = ['Weather conditions are favorable','Low risk across all categories','Great time to travel!']; }
             else if (score < 65) { verdict = 'Caution'; icon = '⚠️'; cls = 'verdict-card--caution'; reasons = ['Some weather risks detected','Pack appropriate gear','Monitor weather updates']; }
             else { verdict = 'Avoid'; icon = '🚫'; cls = 'verdict-card--avoid'; reasons = ['High weather risks detected','Consider postponing your trip','Dangerous conditions likely']; }
-            vc.innerHTML = `<div class="verdict-card ${cls}"><div class="verdict-card__icon">${icon}</div><div class="verdict-card__title">${verdict}</div><p style="color:var(--color-text-secondary)">${city} — Risk Score: ${score}/100</p><ul class="verdict-card__reasons">${reasons.map(r=>'<li>'+r+'</li>').join('')}</ul></div>`;
+            vc.innerHTML = `<div class="verdict-card ${cls}"><div class="verdict-card__icon">${icon}</div><div class="verdict-card__title">${verdict}</div><p style="color:var(--color-text-secondary)">${UI.escapeHtml(city)} — Risk Score: ${score}/100</p><ul class="verdict-card__reasons">${reasons.map(r=>'<li>'+r+'</li>').join('')}</ul></div>`;
         }
 
         // Save trip

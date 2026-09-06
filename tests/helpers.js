@@ -80,6 +80,16 @@ function loadModule(sandbox, relPath) {
   return { sandbox, exports: sandbox.module.exports };
 }
 
+/** Load the inline (src-less) <script> block of a page into the sandbox. */
+function loadInlinePageScript(sandbox, pageFile) {
+  const abs = path.join(__dirname, '..', 'pages', pageFile);
+  const html = fs.readFileSync(abs, 'utf8');
+  const m = html.match(/<script>([\s\S]*?)<\/script>/);
+  if (!m) throw new Error('no inline script in ' + pageFile);
+  vm.runInContext(m[1], sandbox, { filename: pageFile });
+  return sandbox;
+}
+
 /** Read a top-level const/let binding from the context (not attached to sandbox object). */
 function getGlobal(sandbox, name) {
   return vm.runInContext(name, sandbox);
@@ -95,4 +105,4 @@ function withMatchMedia(sandbox, matches = false) {
   return sandbox;
 }
 
-module.exports = { createSandbox, loadModule, getGlobal, withMatchMedia, createStorage, createDocumentStub };
+module.exports = { createSandbox, loadModule, getGlobal, loadInlinePageScript, withMatchMedia, createStorage, createDocumentStub };

@@ -112,23 +112,33 @@
             });
         }
 
+        function sanitizePhone(phone) {
+            return String(phone == null ? '' : phone).replace(/[^\d+\s\-().]/g, '');
+        }
+
         function renderContacts() {
             const list = document.getElementById('contactsList');
             const contacts = Storage.getEmergencyContacts();
             if (!contacts.length) { list.innerHTML = '<p class="empty-state">No emergency contacts saved</p>'; return; }
-            list.innerHTML = contacts.map(c => `
+            list.innerHTML = contacts.map(c => {
+                const safePhone = sanitizePhone(c.phone);
+                return `
                 <div class="emergency-contact-card">
                     <div style="width:44px;height:44px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-user" style="color:#ef4444"></i></div>
                     <div class="emergency-contact-card__info">
-                        <div class="emergency-contact-card__name">${c.name}</div>
-                        <div class="emergency-contact-card__detail">${c.relationship || ''} • ${c.phone}</div>
+                        <div class="emergency-contact-card__name">${UI.escapeHtml(c.name)}</div>
+                        <div class="emergency-contact-card__detail">${UI.escapeHtml(c.relationship || '')} • ${UI.escapeHtml(c.phone)}</div>
                     </div>
                     <div class="emergency-contact-card__actions">
-                        <a href="tel:${c.phone}" class="emergency-btn emergency-btn--call"><i class="fa-solid fa-phone"></i></a>
-                        <a href="sms:${c.phone}" class="emergency-btn emergency-btn--sms"><i class="fa-solid fa-message"></i></a>
-                        <button class="emergency-btn emergency-btn--danger" onclick="removeContact('${c.id}')"><i class="fa-solid fa-trash"></i></button>
+                        <a href="tel:${UI.escapeHtml(safePhone)}" class="emergency-btn emergency-btn--call"><i class="fa-solid fa-phone"></i></a>
+                        <a href="sms:${UI.escapeHtml(safePhone)}" class="emergency-btn emergency-btn--sms"><i class="fa-solid fa-message"></i></a>
+                        <button class="emergency-btn emergency-btn--danger" data-contact-id="${UI.escapeHtml(c.id)}" aria-label="Remove contact"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
+            list.querySelectorAll('[data-contact-id]').forEach(btn => {
+                btn.addEventListener('click', () => removeContact(btn.dataset ? btn.dataset.contactId : btn.getAttribute('data-contact-id')));
+            });
         }
 
         function removeContact(id) {
