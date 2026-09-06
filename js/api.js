@@ -195,19 +195,26 @@ const WeatherAPI = (function () {
         if (cached) return cached;
 
         try {
-            // Fetch weather + air quality in parallel
+            // Fetch weather + air quality + UV index in parallel
+            // NOTE: OWM /data/2.5/uvi is retired — UV comes from Open-Meteo (free, keyless)
             const [wRes, aqRes, uvRes] = await Promise.all([
                 fetch(`${getBaseUrl()}/weather?lat=${lat}&lon=${lon}&appid=${key}&units=metric`),
                 fetch(`${getBaseUrl()}/air_pollution?lat=${lat}&lon=${lon}&appid=${key}`).catch(() => null),
-                fetch(`https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${key}`).catch(() => null)
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=uv_index&timezone=auto`).catch(() => null)
             ]);
 
             if (!wRes.ok) throw new Error('Weather API error ' + wRes.status);
             const w = await wRes.json();
             let aqi = 42;
             try { if (aqRes && aqRes.ok) { const aq = await aqRes.json(); aqi = aq.list?.[0]?.main?.aqi * 25 || 42; } } catch { }
-            let uvIndex = 6;
-            try { if (uvRes && uvRes.ok) { const uv = await uvRes.json(); uvIndex = Math.round(uv.value || 6); } } catch { }
+            let uvIndex = null; // null = unknown (UI shows —); never fabricate
+            try {
+                if (uvRes && uvRes.ok) {
+                    const uv = await uvRes.json();
+                    const v = uv?.current?.uv_index;
+                    if (typeof v === 'number' && isFinite(v)) uvIndex = Math.max(0, Math.round(v));
+                }
+            } catch { }
 
             const isDay = w.weather?.[0]?.icon?.endsWith('d') ?? true;
             const result = {

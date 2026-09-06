@@ -30,7 +30,7 @@
 |---|---|---|---|---|
 | BUG-01 | 🔴 | `hourly.html` / `weekly.html` are dead AND orphan: no render logic (no `app.js` page handler, no inline JS) and zero inbound links | ✅ FIXED | `npm test` (ui-render) + `node --check` + link grep |
 | BUG-02 | 🟠 | `getWeeklyForecast()` ignores lat/lon, always returns random mock data presented as a real forecast | ✅ FIXED | `npm test` (api-forecast) + lint |
-| BUG-03 | 🟠 | Deprecated OWM UV endpoint (`/data/2.5/uvi` retired) → UV silently falls back to hardcoded `6` | TODO | — |
+| BUG-03 | 🟠 | Deprecated OWM UV endpoint (`/data/2.5/uvi` retired) → UV silently falls back to hardcoded `6` | ✅ FIXED | `npm test` (api-current) + lint |
 | BUG-04 | 🟠 | Stored/reflected XSS via `innerHTML`: trip city, search results, compare cities, emergency contacts, popular cities (no escaping anywhere) | TODO | — |
 | BUG-05 | 🟠 | Hardcoded OpenWeatherMap API key in `js/config.js` (committed secret) | TODO | — |
 | BUG-06 | 🟠 | Trip planner double-binding: `trip-planner.js` + page inline script both handle `#analyzeBtn` → double render / conflicting output, `#verdictCard` only in one path | TODO | — |
@@ -75,7 +75,12 @@
 - **Verify:** `npm test` 20/20 (5 new `api-forecast` tests); `npm run lint` clean.
 - **Files:** `js/api.js`, `tests/api-forecast.test.js`
 
-*(next: BUG-03)*
+### BUG-03 — Working UV source (Open-Meteo) ✅ FIXED (attempt 1)
+- **Change:** `js/api.js` `getCurrentWeather()`: UV now fetched from Open-Meteo `current=uv_index` (keyless); retired `/data/2.5/uvi` call removed. On failure `uvIndex` is `null` (UI renders `—`) instead of fabricated `6`. Downstream safe: `UI.getUVLevel(null)` → `—`, `RiskEngine` keeps its documented `|| 6` modeling default.
+- **Verify:** `npm test` 22/22 (2 new `api-current` tests: rounding/URL assertions, null-on-failure); `npm run lint` clean.
+- **Files:** `js/api.js`, `tests/api-current.test.js`
+
+*(next: BUG-04)*
 
 ---
 
