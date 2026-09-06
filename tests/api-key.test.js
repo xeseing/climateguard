@@ -47,7 +47,7 @@ test('API key resolves from window global when no override', async () => {
 test('no fetch happens when no key is configured anywhere', async () => {
   let calls = 0;
   const sandbox = loadAPI(async () => { calls++; return { ok: true, json: async () => [] }; });
-  const res = await sandbox.WeatherAPI.searchLocations('Paris');
+  const res = await sandbox.WeatherAPI.searchLocations('Xyzqqp Not A City');
   assert.deepStrictEqual(Array.from(res), []);
   assert.equal(calls, 0);
 });

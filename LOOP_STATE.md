@@ -35,7 +35,7 @@
 | BUG-05 | 🟠 | Hardcoded OpenWeatherMap API key in `js/config.js` (committed secret) | ✅ FIXED | `npm test` (api-key) + lint |
 | BUG-06 | 🟠 | Trip planner double-binding: `trip-planner.js` + page inline script both handle `#analyzeBtn` → double render / conflicting output, `#verdictCard` only in one path | ✅ FIXED | `npm test` (trip-bindings) + lint |
 | BUG-07 | 🟡 | `getCurrentLocation()` swallows denial errors, resolves SF fallback → "Use Current Location" silently teleports user to San Francisco | ✅ FIXED | `npm test` (geolocation) + lint |
-| BUG-08 | 🟡 | `searchLocations()` returns `[]` with no API key instead of local-DB fallback → search dead offline/keyless | TODO | — |
+| BUG-08 | 🟡 | `searchLocations()` returns `[]` with no API key instead of local-DB fallback → search dead offline/keyless | ✅ FIXED | `npm test` (search-fallback) + lint |
 | BUG-09 | 🟡 | Risk report race: page waits fixed 800 ms then reads possibly-stale/missing `LAST_WEATHER` cache, silently falls back to SF mock | TODO | — |
 | BUG-10 | 🟡 | Map layer buttons (temp/wind/precip/clouds) only swap the legend — no actual tile-layer change; all 30 city markers are hardcoded static fake data | TODO | — |
 | BUG-11 | 🟡 | `particles.js` snow color hack produces invalid 5-component `rgba()` → `fillStyle` assignment ignored (snow renders wrong/invisible) | TODO | — |
@@ -100,7 +100,12 @@
 - **Verify:** `npm test` 40/40 (4 new `geolocation` tests: success, denial rejection, unsupported, `loadWeather` fallback); `npm run lint` clean.
 - **Files:** `js/api.js`, `js/app.js`, `tests/geolocation.test.js`
 
-*(next: BUG-08)*
+### BUG-08 — Keyless search via bundled DB ✅ FIXED (attempt 1)
+- **Change:** `searchLocations()` returns `searchLocalDB(q)` when no API key is configured (previously `[]`). `api-key.test.js` "no fetch" case updated to an unknown place (Paris now correctly resolves locally).
+- **Verify:** `npm test` 44/44 (4 new `search-fallback` tests: local match, region/country match, unknown → `[]`, short query); `npm run lint` clean.
+- **Files:** `js/api.js`, `tests/search-fallback.test.js`, `tests/api-key.test.js`
+
+*(next: BUG-09)*
 
 ---
 

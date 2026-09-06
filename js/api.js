@@ -135,7 +135,7 @@ const WeatherAPI = (function () {
         const q = query.trim();
         if (q.length < 2) return [];
         const key = getApiKey();
-        if (!key) return [];
+        if (!key) return searchLocalDB(q); // keyless/offline: bundled city DB
 
         const ck = 'geo_' + q.toLowerCase();
         const cached = cacheGet(ck);
