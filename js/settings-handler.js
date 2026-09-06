@@ -11,22 +11,16 @@
         const s = Storage.getSettings();
         const profile = Storage.getProfile();
 
-        // Theme toggle
+        // Theme toggle — Theme module is the single source of truth
+        // (Theme.init already applied the saved theme on load)
         const themeToggle = document.getElementById('themeToggle');
         if (themeToggle) {
-            themeToggle.checked = s.theme === 'dark';
+            themeToggle.checked = s.theme !== 'light';
             themeToggle.addEventListener('change', e => {
-                const isDark = e.target.checked;
-                Storage.updateSettings({ theme: isDark ? 'dark' : 'light' });
-                document.body.classList.toggle('light', !isDark);
-                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                const next = e.target.checked ? 'dark' : 'light';
+                Storage.updateSettings({ theme: next });
+                if (typeof Theme !== 'undefined') Theme.applyTheme(next);
             });
-            // Apply on load
-            if (s.theme === 'light') {
-                document.body.classList.add('light');
-                document.documentElement.setAttribute('data-theme', 'light');
-                themeToggle.checked = false;
-            }
         }
 
         // Animations toggle
