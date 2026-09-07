@@ -175,14 +175,14 @@
 
 ---
 
-## PHASE 3 — UI/UX & feature roadmap (IN PROGRESS — Steps 1–2 ordered first)
+## PHASE 3 — UI/UX & feature roadmap ✅ COMPLETE (Steps 1–4)
 
-1. Badge mock/demo data wherever fallback data is shown (honest UI). [QUEUED — Step 3, after report-back]
+1. Badge mock/demo data wherever fallback data is shown (honest UI). [✅ STEP 3 DONE — see below]
 2. ~~Real OWM tile layers on map + live marker data.~~ ✅ DONE in Phase 2 (BUG-10).
 3. Units toggle (°C/°F) wiring (resolves dead `units` setting). [✅ STEP 1 DONE — see below]
-4. PWA manifest + service worker (offline-first for static shell). [QUEUED — Step 4, after report-back]
+4. PWA manifest + service worker (offline-first for static shell). [✅ STEP 4 DONE — see below]
 5. ~~Root landing (`index.html` redirect or move).~~ ✅ DONE in Phase 2 (BUG-16).
-6. i18n attribute pass over all pages (needs BUG-13 first). [open]
+6. i18n attribute pass over all pages (needs BUG-13 first). [open — deferred, out of Phase 3 scope]
 7. Design polish: skeleton loaders, empty states, focus styles. [✅ STEP 2 DONE — see below]
 
 ### Step 1 — Unit Toggling & State Sync ✅ DONE (commits `d0d2c57`, `e2bf800`)
@@ -192,6 +192,20 @@
 ### Step 2 — Skeletons, Micro-interactions, Responsive Polish ✅ DONE (commits `69a1efb`, `d5d1463`)
 - **Change:** new `UI.showSkeleton(id|el, rows=3, variant)` + `UI.emptyHTML`/`UI.renderEmpty` (XSS-escaped); renderers clear `aria-busy` on paint; wired into hourly/weekly/search/popular async paths (replaces blocking spinner line in search). CSS: `.skeleton--row`, `prefers-reduced-motion` guard, `.hero-temp` fluid `clamp(4.5rem,22vw,8rem)` (replaces fixed 8rem inline style), `.tab-item:active` press states, 360px breakpoint, `.empty-state` icon/hint styles. Test-helper `makeEl` now stores attributes (`set/get/removeAttribute`).
 - **Verify:** `npm test` **111/111** (7 new `skeletons` + 5 new `polish` tests); `npm run lint` clean.
+
+### Step 3 — Data Provenance & Mock Badging ✅ DONE
+- **Change:** `js/api.js` tags every `getCurrentWeather` result with `source: live|cached|demo` (demo returns a copy — shared `MOCK_CURRENT` untouched) and exposes `getLastSource(kind)` for all three data kinds (forecast arrays left untagged so deep-equal checks hold). New `UI.sourceBadge(source)` (honest default: unknown → Demo) + `UI.setSourceBadge(source, slot)`; theme-adaptive `.source-badge--live/cached/demo` CSS with `body.light` contrast overrides. Wired: hero/location slot, hourly/weekly slots, popular-dest cards, per-row compare badges, risk-report `setSourceBadge(source)` (guarded — old fixtures lack `UI`), map info-panel badge (`#infoSource`, `ui.js` added to map page scripts).
+- **Verify:** `npm test` **124/124** (13 new `provenance` tests: 6 API tagging + 2 badge helpers + 1 CSS + 4 wiring incl. functional compare/risk/popular); `npm run lint` clean.
+
+### Step 4 — PWA Offline Shell & Service Worker ✅ DONE
+- **Change:** root `manifest.json` (standalone, `#0a0a12` theme, `start_url: pages/index.html`, 192/512 + maskable icons; relative paths = sub-path-deploy safe) linked from all 9 pages + root landing. Hand-drawn sun-over-cloud icons (`scripts/make-icons.sh` + ImageMagick → 192/512/maskable/apple-touch PNGs). Root `service-worker.js`: SWR for the 39-asset static shell, network-first + runtime cache for OWM/Open-Meteo (+ OWM tiles), navigation fallback to cached start page, versioned cache purge on activate. New `js/pwa.js` (`PWA.register()` → registered/failed/unsupported, never throws; worker URL derived from `document.currentScript` so any page depth works) auto-registers on DOMContentLoaded; offline banner + notifications already existed in `app.js`. Lint extended to cover `service-worker.js`; sandbox gained `URL`.
+- **Verify:** `npm test` **138/138** (14 new `pwa` tests: manifest validity, PNG IHDR dimension checks, page tags, precache-vs-disk, install/activate, network-first + offline fallback, SWR revalidation, nav shell fallback, non-GET ignore, registration ×3); `npm run lint` clean.
+
+## PHASE 3 — COMPLETE (4/4 steps, 138 tests green, lint clean)
+
+**Final tally (2026-09-07):** Phase 2 (83 tests) + Phase 3 (55 new tests) = **138/138 pass** across 26 test files (`npm test`); **lint clean** (`npm run lint`, covers `js/`, root SW, all inline page scripts).
+- **Architecture summary:** static multi-page app (`pages/` × 9, `js/` × 14 IIFE modules, `css/` × 10, no build). Data layer `api.js` (OWM + Open-Meteo UV, sessionStorage cache, provenance tagging) → render layer `ui.js`/`app.js` + page inline scripts → cross-cutting `units.js` (display-only °C/°F), `storage.js`, `theme.js`, `i18n.js`, `pwa.js`. Offline story: SW shell + runtime API cache + in-app `LAST_WEATHER` fallback + offline banner; honest-UI story: every weather surface carries a Live/Cached/Demo badge and keyless installs show placeholders, never fake numbers.
+- Known remaining nits (unchanged): full-page i18n attribute pass (item 6), pressure-gauge static companions, dynamic JS strings untranslated, mock-flag refinement for the risk-report SF-edge check.
 
 ---
 

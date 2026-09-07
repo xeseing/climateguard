@@ -67,6 +67,7 @@ function createDocumentStub() {
 function createSandbox(extra = {}) {
   const sandbox = {
     console,
+    URL,
     setTimeout,
     clearTimeout,
     setInterval,

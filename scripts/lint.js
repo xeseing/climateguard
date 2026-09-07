@@ -23,6 +23,7 @@ function checkFile(file) {
 for (const f of fs.readdirSync(path.join(root, 'js'))) {
   if (f.endsWith('.js')) checkFile(path.join(root, 'js', f));
 }
+checkFile(path.join(root, 'service-worker.js'));
 
 // 2. Inline scripts in pages (skip src-only tags)
 const pagesDir = path.join(root, 'pages');
