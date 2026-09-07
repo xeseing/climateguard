@@ -71,6 +71,7 @@ const App = (function() {
             state.lastAnalysisTime = new Date();
 
             UI.updateWeatherDisplay(data);
+            UI.setSourceBadge(data.source || WeatherAPI.getLastSource('current'));
             if (typeof WeatherEngine !== 'undefined') WeatherEngine.updateFromData(data);
             applyAutoWeatherTheme(data);
             updateRiskSummary(data);
@@ -83,6 +84,7 @@ const App = (function() {
             if (cached) {
                 state.weatherData = cached;
                 UI.updateWeatherDisplay(cached);
+                UI.setSourceBadge('cached');
                 UI.showNotification('Using cached weather data', 'warning');
             } else {
                 showApiUnavailable();
@@ -189,6 +191,7 @@ const App = (function() {
         UI.showSkeleton('hourlyList', 8);
         const hours = await WeatherAPI.getHourlyForecast(lat, lon);
         UI.renderHourlyList(hours);
+        UI.setSourceBadge(WeatherAPI.getLastSource('hourly'));
         updatePageSubtitle('Next 24 hours');
         if (typeof AnimationEngine !== 'undefined') AnimationEngine.setupCardHoverEffects();
     }
@@ -198,6 +201,7 @@ const App = (function() {
         UI.showSkeleton('weeklyContainer', 7);
         const days = await WeatherAPI.getWeeklyForecast(lat, lon);
         UI.renderWeeklyList(days);
+        UI.setSourceBadge(WeatherAPI.getLastSource('weekly'));
         updatePageSubtitle('This week');
         if (typeof AnimationEngine !== 'undefined') AnimationEngine.setupCardHoverEffects();
     }
@@ -234,9 +238,10 @@ const App = (function() {
                     <div class="popular-dest-card__city">${c.name}</div>
                     <div class="popular-dest-card__temp">${temp}</div>
                     <span class="popular-dest-card__badge" style="background:${level.color}20;color:${level.color}">${level.label}</span>
+                    ${UI.sourceBadge(d && d.source)}
                 </div>`;
             } catch {
-                return `<div class="popular-dest-card"><div class="popular-dest-card__city">${c.name}</div><div class="popular-dest-card__temp">—</div></div>`;
+                return `<div class="popular-dest-card"><div class="popular-dest-card__city">${c.name}</div><div class="popular-dest-card__temp">—</div>${UI.sourceBadge('demo')}</div>`;
             }
         }));
         container.setAttribute('aria-busy', 'false');

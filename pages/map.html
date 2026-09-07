@@ -100,7 +100,7 @@
 
     <div class="map-info" id="mapInfo">
         <div class="map-info-head">
-            <div style="display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-circle-info" style="color:#2bd4a7;"></i><strong id="infoName">City</strong></div>
+            <div style="display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-circle-info" style="color:#2bd4a7;"></i><strong id="infoName">City</strong><span id="infoSource"></span></div>
             <button class="close-info" id="closeInfo"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="map-info-stats">
@@ -130,6 +130,7 @@
     <script src="../js/storage.js"></script><script src="../js/units.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/risk-engine.js"></script>
+    <script src="../js/ui.js"></script>
     <script>
     (function(){
         // City facts only (name + coords) — weather is fetched live, never hardcoded
@@ -213,14 +214,14 @@
 
         // Live marker data (bounded parallelism); keyless → placeholders, no fake numbers
         var liveCities=[];
-        function demoCity(c){return{name:c.name,lat:c.lat,lon:c.lon,temp:null,wind:null,hum:null,cond:'',risk:'Unknown'};}
+        function demoCity(c){return{name:c.name,lat:c.lat,lon:c.lon,temp:null,wind:null,hum:null,cond:'',risk:'Unknown',source:'demo'};}
         async function fetchLive(c){
             try{
                 var w=await WeatherAPI.getCurrentWeather(c.lat,c.lon);
                 var m=(w&&w.weather)||{};
                 var risk='Unknown';
                 if(m.temp!=null&&typeof RiskEngine!=='undefined'){risk=RiskEngine.analyzeRisks(w).overallLevel.label;}
-                return{name:c.name,lat:c.lat,lon:c.lon,temp:m.temp!=null?m.temp:null,wind:m.windSpeed!=null?m.windSpeed:null,hum:m.humidity!=null?m.humidity:null,cond:m.conditionText||'',risk:risk};
+                return{name:c.name,lat:c.lat,lon:c.lon,temp:m.temp!=null?m.temp:null,wind:m.windSpeed!=null?m.windSpeed:null,hum:m.humidity!=null?m.humidity:null,cond:m.conditionText||'',risk:risk,source:(w&&w.source)||'demo'};
             }catch(e){return demoCity(c);}
         }
         async function pool(items,n,fn){
@@ -246,6 +247,7 @@
             document.getElementById('infoHum').textContent=c.hum==null?'--':c.hum+'%';
             var re=document.getElementById('infoRisk');
             re.textContent=c.risk; re.style.color=riskColor(c.risk);
+            UI.setSourceBadge(c.source||'demo','infoSource');
             document.getElementById('mapInfo').classList.add('show');
             document.getElementById('legend').style.display='none';
         }

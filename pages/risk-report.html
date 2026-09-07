@@ -57,6 +57,7 @@
                     <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-accent); margin-right: 8px;"></i> <span data-i18n="weatherRiskReport">Weather Risk Report</span>
                 </h1>
                 <p class="page-header__subtitle" id="reportLocation">San Francisco • Generated now</p>
+                <span id="sourceBadge"></span>
             </div>
 
             <!-- Overall Risk Gauge -->
@@ -268,6 +269,7 @@
                 const provenance = source === 'live' ? `Updated ${dataTime}` : source === 'cached' ? `Cached data from ${dataTime}` : 'Demo data';
                 locEl.textContent = `${riskReport.location.name || 'San Francisco'} • ${provenance}`;
             }
+            if (typeof UI !== 'undefined' && UI.setSourceBadge) UI.setSourceBadge(source);
 
             // Animate gauge
             animateGauge(riskReport.overallScore, riskReport.overallLevel);

@@ -196,14 +196,21 @@ const WeatherAPI = (function () {
         ).slice(0, 10);
     }
 
+    // ─── Provenance tracking (Step 3: honest Live/Cached/Demo badging) ──
+    // getCurrentWeather results carry a `source` field; forecast arrays are
+    // left untagged (callers use getLastSource) so deep-equal checks keep working.
+    const lastSource = { current: null, hourly: null, weekly: null };
+    function getLastSource(kind) { return lastSource[kind] || null; }
+    function demoCurrent() { return { ...MOCK_CURRENT, source: 'demo' }; }
+
     // ─── Current weather ─────────────────────────────────────
     async function getCurrentWeather(lat, lon) {
         const key = getApiKey();
-        if (!key) return MOCK_CURRENT;
+        if (!key) { lastSource.current = 'demo'; return demoCurrent(); }
 
         const ck = `weather_${lat.toFixed(2)}_${lon.toFixed(2)}`;
         const cached = cacheGet(ck);
-        if (cached) return cached;
+        if (cached) { cached.source = 'cached'; lastSource.current = 'cached'; return cached; }
 
         try {
             // Fetch weather + air quality + UV index in parallel
@@ -243,24 +250,27 @@ const WeatherAPI = (function () {
                     precipitation: w.rain?.['1h'] || w.rain?.['3h'] || 0,
                     cloudCover: w.clouds?.all || 0, isDay
                 },
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                source: 'live'
             };
             cacheSet(ck, result);
+            lastSource.current = 'live';
             return result;
         } catch (err) {
             console.error('API Error:', err);
-            return MOCK_CURRENT;
+            lastSource.current = 'demo';
+            return demoCurrent();
         }
     }
 
     // ─── Forecasts (use 5-day / 3-hour API) ──────────────────
     async function getHourlyForecast(lat, lon) {
         const key = getApiKey();
-        if (!key || !validCoords(lat, lon)) return generateHourly();
+        if (!key || !validCoords(lat, lon)) { lastSource.hourly = 'demo'; return generateHourly(); }
 
         const ck = `hourly_${lat.toFixed(2)}_${lon.toFixed(2)}`;
         const cached = cacheGet(ck);
-        if (cached) return cached;
+        if (cached) { lastSource.hourly = 'cached'; return cached; }
 
         try {
             const res = await fetch(`${getBaseUrl()}/forecast?lat=${lat}&lon=${lon}&appid=${key}&units=metric&cnt=24`);
@@ -280,8 +290,10 @@ const WeatherAPI = (function () {
                 };
             });
             cacheSet(ck, hours);
+            lastSource.hourly = 'live';
             return hours;
         } catch {
+            lastSource.hourly = 'demo';
             return generateHourly();
         }
     }
@@ -330,21 +342,23 @@ const WeatherAPI = (function () {
 
     async function getWeeklyForecast(lat, lon) {
         const key = getApiKey();
-        if (!key || !validCoords(lat, lon)) return generateWeekly();
+        if (!key || !validCoords(lat, lon)) { lastSource.weekly = 'demo'; return generateWeekly(); }
 
         const ck = `weekly_${lat.toFixed(2)}_${lon.toFixed(2)}`;
         const cached = cacheGet(ck);
-        if (cached) return cached;
+        if (cached) { lastSource.weekly = 'cached'; return cached; }
 
         try {
             const res = await fetch(`${getBaseUrl()}/forecast?lat=${lat}&lon=${lon}&appid=${key}&units=metric&cnt=40`);
             if (!res.ok) throw new Error('Forecast error');
             const data = await res.json();
             const days = aggregateDaily(data.list || []);
-            if (!days.length) return generateWeekly();
+            if (!days.length) { lastSource.weekly = 'demo'; return generateWeekly(); }
             cacheSet(ck, days);
+            lastSource.weekly = 'live';
             return days;
         } catch {
+            lastSource.weekly = 'demo';
             return generateWeekly();
         }
     }
@@ -384,6 +398,7 @@ const WeatherAPI = (function () {
 
     return {
         getCurrentWeather, getHourlyForecast, getWeeklyForecast,
+        getLastSource,
         searchLocations, getCurrentLocation, reverseGeocode,
         getIconForCondition: iconFor, formatCondition: condLabel,
         getAllCities, CITY_DB, MOCK_DATA: { current: MOCK_CURRENT, hourly: generateHourly(), weekly: generateWeekly() }

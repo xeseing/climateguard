@@ -227,6 +227,20 @@ const UI = (function() {
         container.innerHTML = emptyHTML(opts.icon, opts.title, opts.hint);
     }
 
+    // ─── DATA SOURCE BADGES (Live / Cached / Demo) ─────────────
+    const SOURCE_LABELS = { live: 'Live', cached: 'Cached', demo: 'Demo' };
+    function sourceBadge(source) {
+        const key = SOURCE_LABELS[source] ? source : 'demo'; // honest default
+        return `<span class="source-badge source-badge--${key}">` +
+            `<span class="source-badge__dot" aria-hidden="true"></span>${SOURCE_LABELS[key]}</span>`;
+    }
+
+    function setSourceBadge(source, slotId = 'sourceBadge') {
+        const slot = document.getElementById(slotId);
+        if (!slot) return;
+        slot.innerHTML = sourceBadge(source);
+    }
+
     // ─── NOTIFICATIONS ───────────────────────────────────────
     function showNotification(message, type = 'info') {
         const existing = document.querySelector('.notification');
@@ -280,6 +294,7 @@ const UI = (function() {
         init, openSettings, updateWeatherDisplay, renderHourlyForecast,
         renderHourlyList, renderWeeklyList, buildHourlyListHTML, buildWeeklyListHTML,
         escapeHtml, showNotification, showLoading, hideLoading, setText,
-        showSkeleton, emptyHTML, renderEmpty
+        showSkeleton, emptyHTML, renderEmpty,
+        sourceBadge, setSourceBadge
     };
 })();
